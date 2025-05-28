@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.LifecycleState;
 import project.k_SoolMate.domain.address.Address;
 import project.k_SoolMate.domain.order.Order;
 
@@ -41,9 +40,60 @@ public class User {
     @Embedded
     private Address address;
 
-    //==연관관계 메서드 ==//
+    /**
+     * 연관관계 메서드
+     */
     //양방향 매핑을 해야하는데 엔티티는 setter 열리지않아서 order에만 set해줌
     public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
+
+    //==생성 메서드==//
+
+    /**
+     * 멤버 생성
+     */
+    public static User createUser(String loginId, String loginPw, String name, String phoneNumber, String email, Address address) {
+        User user = new User();
+        user.loginId = loginId;
+        user.loginPw = loginPw;
+        user.name = name;
+        user.role = UserRole.USER;
+        user.status = UserStatus.ACTIVE;
+        user.phoneNumber = phoneNumber;
+        user.email = email;
+        return user;
+    }
+
+    /**
+     * 멤버 수정
+     */
+    public void updateUser(String phoneNumber, String email, Address address) {
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+    }
+
+    /**
+     * 멤버 삭제
+     */
+    //멤버 삭제는 repository 삭제가 아닌 Soft Delete라서 상태 변경만 한다.
+    public void deleteMember() {
+        this.status = UserStatus.DELETE;
+    }
+    /**
+     * JPA 콜백 메서드로 생성/수정 시간 자동 설정
+     */
+    @PrePersist // 저장 전 자동으로 createAt, updatedAt 설정
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate // 수정 전 자동으로 updatedAt 갱신
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
 }
