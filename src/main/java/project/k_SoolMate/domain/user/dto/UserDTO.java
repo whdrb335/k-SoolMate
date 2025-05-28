@@ -2,7 +2,7 @@ package project.k_SoolMate.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import project.k_SoolMate.domain.user.User;
+import project.k_SoolMate.domain.user.entity.User;
 
 @Getter
 @AllArgsConstructor

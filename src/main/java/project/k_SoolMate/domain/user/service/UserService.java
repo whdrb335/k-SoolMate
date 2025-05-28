@@ -5,13 +5,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.k_SoolMate.domain.user.User;
+import project.k_SoolMate.domain.user.api.LoginUserRequest;
+import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.repository.UserRepository;
 import project.k_SoolMate.domain.user.request.CreateUserRequest;
 import project.k_SoolMate.domain.user.request.UpdateUserRequest;
 import project.k_SoolMate.exception.user.DuplicateUserIdException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
+import project.k_SoolMate.exception.user.NotFoundUserIdException;
+import project.k_SoolMate.exception.user.NotMatchPasswd;
 
 @Service
 // 기본적 DB 읽기전용 (최적화)
@@ -70,6 +73,17 @@ public class UserService {
     public UserDTO updateMyInfo(Long id, UpdateUserRequest request) {
         User user = getUserFindById(id);
         user.updateUser(request.getPhoneNumber(), request.getEmail(), request.getAddress());
+        return new UserDTO(user);
+    }
+
+    /**
+     * 로그인
+     */
+    @Transactional
+    public UserDTO login(LoginUserRequest request) {
+        User user = userRepository.findByLoginId(request.getLoginId()).orElseThrow(
+                () -> new NotFoundUserIdException("존재하지 않은 아이디입니다.", HttpStatus.NOT_FOUND));
+        user.isMatchPasswd(request.getLoginPw(),bCryptPasswordEncoder);
         return new UserDTO(user);
     }
 

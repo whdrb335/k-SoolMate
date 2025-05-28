@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import project.k_SoolMate.domain.delivery.Delivery;
 import project.k_SoolMate.domain.item.OrderSool;
-import project.k_SoolMate.domain.user.User;
+import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.exception.order.AlreadyCancelOrder;
 
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package project.k_SoolMate.domain.user;
+package project.k_SoolMate.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
