@@ -30,4 +30,8 @@ public class OrderSool {
     public void setOrder(Order order) {
         this.order = order;
     }
+    //양방향 매핑을 해야하는데 엔티티는 setter 열리지않아서 item에만 set해줌
+    public void setItem(Item item) {
+        this.item = item;
+    }
 }

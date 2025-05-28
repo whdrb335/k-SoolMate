@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -12,17 +15,28 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "item_type")
 public abstract class Item {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "item_id")
     private Long id;
 
     private String name;
     private int price;
     private String description;
-    
+
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
-    
+
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus;
+
+    @OneToMany(mappedBy = "item")
+    private List<OrderSool> orderSools = new ArrayList<>();
+
+    //==연관관계 메서드==//
+
+    public void addOrderSool(OrderSool orderSool) {
+        orderSools.add(orderSool);
+        orderSool.setItem(this);
+    }
 }
