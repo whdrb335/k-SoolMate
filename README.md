@@ -55,13 +55,29 @@ src
 
 ## 🧩 핵심 기능 (v1 기준)
 
-- [x] `Item` 추상화 및 `Sool` 구현
-- [x] `User` 도메인 + soft delete + 생성/수정 시간 자동화
-- [x] `Delivery` 도메인 + Address 임베딩
-- [x] `increaseStock`, `decreaseStock` 재고 관리
-- [ ] `Order` 도메인 설계 및 주문 취소 로직 (`v2 목표`)
-- [ ] `@RestControllerAdvice` 기반 예외 처리 통합 (`v2 목표`)
+- [x] `Item` 추상화 및 `Sool` 구현  
+- [x] `User` 도메인  
+  - soft delete 적용 + 생성/수정 시간 자동화  
+  - 회원 가입, 정보 수정, 비밀번호 검증/변경 기능 구현  
+  - `BCryptPasswordEncoder`를 도메인에 직접 new 하지 않고 Service에서 주입 후 전달  
+  - 유저 조회는 `getUserFindById()`로 캡슐화하여 중복 제거 및 예외 처리 일관성 유지  
+  - DTO(`UserDTO`)를 활용한 안전한 응답 처리  
+  - `@Valid`로 유효성 검증 적용 (`@Embeddable` Address 포함)  
+  - 전역 예외 처리 구조 완성 → `GlobalAdvice`에서 `UserException` 통합 처리  
+
+    ```json
+    {
+      "code": "USER_EX",
+      "message": "비밀번호가 맞지 않습니다"
+    }
+    ```
+- [x] `Delivery` 도메인 + `Address` 임베딩  
+- [x] `increaseStock`, `decreaseStock` 재고 관리  
+- [ ] `Order` 도메인 설계 및 주문 취소 로직 (`v2 목표`)  
+- [ ] `@RestControllerAdvice` 기반 예외 처리 통합 (`v2 목표`)  
 - [ ] Swagger API 문서화 및 운영환경 전환 (`v3 목표`)
+
+
 
 ---
 
