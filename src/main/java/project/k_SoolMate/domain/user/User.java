@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.k_SoolMate.domain.address.Address;
 import project.k_SoolMate.domain.order.Order;
+import project.k_SoolMate.exception.user.NotMatchPasswd;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,10 +56,11 @@ public class User {
     /**
      * 멤버 생성
      */
-    public static User createUser(String loginId, String loginPw, String name, String phoneNumber, String email, Address address) {
+    public static User createUser(String loginId, String loginPw, String name, String phoneNumber, String email, Address address,BCryptPasswordEncoder bCryptPasswordEncoder) {
         User user = new User();
         user.loginId = loginId;
-        user.loginPw = loginPw;
+        //비밀번호를 암호화시켜서 저장한다.
+        user.loginPw = bCryptPasswordEncoder.encode(loginPw);
         user.name = name;
         user.role = UserRole.USER;
         user.status = UserStatus.ACTIVE;
@@ -72,6 +76,25 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
+    }
+
+    /**
+     * 비밀번호 확인 로직
+     */
+    public void isMatchPasswd(String passwd,BCryptPasswordEncoder bCryptPasswordEncoder) {
+        if (!bCryptPasswordEncoder.matches(passwd, this.loginPw)) {
+            throw new NotMatchPasswd("비밀번호가 맞지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 비밀번호 변경 로직
+     */
+    public void changePasswd(String oldPasswd, String newPasswd,BCryptPasswordEncoder bCryptPasswordEncoder) {
+        if (!bCryptPasswordEncoder.matches(oldPasswd, this.loginPw)) {
+            throw new NotMatchPasswd("비밀번호가 맞지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+        this.loginPw = bCryptPasswordEncoder.encode(newPasswd);
     }
 
     /**
