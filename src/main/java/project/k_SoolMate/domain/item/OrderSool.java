@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.k_SoolMate.domain.item.sool.Sool;
 import project.k_SoolMate.domain.order.Order;
 
 @Entity
@@ -22,7 +23,7 @@ public class OrderSool {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    private int OrderPrice;
+    private int orderPrice;
     private int count;
 
     //==연관관계 메서드==//
@@ -34,4 +35,29 @@ public class OrderSool {
     public void setItem(Item item) {
         this.item = item;
     }
+
+    //==생성 메서드==//
+
+    /**
+     * OrderSool 생성
+     */
+    public static OrderSool createOrderSool(Sool sool, int orderPrice, int count) {
+        OrderSool orderSool = new OrderSool();
+        orderSool.setItem(sool);
+        orderSool.orderPrice = orderPrice;
+        orderSool.count = count;
+        sool.removeStock(count); // 주문시 재고 감소
+        return orderSool;
+    }
+
+    /**
+     * 취소시 재고증가
+     */
+    public void delete() {
+        if (item instanceof Sool sool) {
+            sool.addStock(count);
+        }
+    }
+
+
 }
