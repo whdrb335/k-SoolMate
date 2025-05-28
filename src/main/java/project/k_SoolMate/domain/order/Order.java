@@ -36,4 +36,21 @@ public class Order {
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<OrderSool> orderSools = new ArrayList<>();
+
+    //==연관관계 메서드==//
+
+    public void setUser(User user) {
+        this.user = user;
+        user.getOrders().add(this);
+    }
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
+
+    public void addOrderSool(OrderSool orderSool) {
+        orderSools.add(orderSool);
+        orderSool.setOrder(this);
+    }
 }

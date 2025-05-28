@@ -21,4 +21,10 @@ public class Delivery {
     private Order order;
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
+
+    //==연관관계 메서드==
+    //양방향 매핑을 해야하는데 엔티티는 setter 열리지않아서 order에만 set해줌
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

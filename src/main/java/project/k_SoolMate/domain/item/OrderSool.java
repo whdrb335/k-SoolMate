@@ -17,4 +17,10 @@ public class OrderSool {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    //==연관관계 메서드==//
+    //양방향 매핑을 해야하는데 엔티티는 setter 열리지않아서 order에만 set해줌
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }
