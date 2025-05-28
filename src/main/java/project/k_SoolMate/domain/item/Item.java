@@ -21,7 +21,6 @@ public abstract class Item {
     private Long id;
 
     private String name;
-    private int price;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -39,4 +38,33 @@ public abstract class Item {
         orderSools.add(orderSool);
         orderSool.setItem(this);
     }
+
+    //==생성 메서드==//
+
+    /**
+     * 아이템 생성
+     */
+    //밑에 자식들에게 물려주는 공통적인 필드구성
+    protected void setCommonFieldsCreate(String name, String description, ItemType itemType) {
+        this.name = name;
+        this.description = description;
+        this.itemType = itemType;
+        this.itemStatus = ItemStatus.ACTIVE;
+    }
+
+    /**
+     * 아이템 업데이트
+     */
+    protected void setCommonFieldsUpdate(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    /**
+     * 아이템 삭제(소프트 삭제)
+     */
+    protected void deleteItem() {
+        this.itemStatus = ItemStatus.DELETE;
+    }
+
 }
