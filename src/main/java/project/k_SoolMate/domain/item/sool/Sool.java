@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import project.k_SoolMate.domain.item.Item;
 import project.k_SoolMate.domain.item.ItemType;
+import project.k_SoolMate.exception.item.NotEnoughException;
 
 @Entity
 @Getter
@@ -70,6 +71,7 @@ public class Sool extends Item {
     public void removeStock(int count) {
         int restStock = this.stockQuantity - count;
         if (restStock < 0) {
+            //재고 부족 에러를 HttpStatus랑 같이보낸다.
             throw new NotEnoughException("재고가 부족합니다.", HttpStatus.BAD_REQUEST);
         }
         this.stockQuantity = restStock;
