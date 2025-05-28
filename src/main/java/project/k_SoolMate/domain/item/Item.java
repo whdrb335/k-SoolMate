@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorColumn(name = "item_type")
 public abstract class Item {
     @Id @GeneratedValue
+    @Column(name = "item_id")
     private Long id;
 
     private String name;
