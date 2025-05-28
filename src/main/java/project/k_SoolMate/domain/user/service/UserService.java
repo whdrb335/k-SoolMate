@@ -82,7 +82,7 @@ public class UserService {
 
     //==회원 로그인 ID 중복 메서드==//
     private void validateDuplicateUser(String loginId) {
-        if (userRepository.findByLoginId(loginId)) {
+        if (userRepository.existsByLoginId(loginId)) {
             throw new DuplicateUserIdException("이미 존재하는 아이디 입니다.", HttpStatus.CONFLICT);
         }
     }
