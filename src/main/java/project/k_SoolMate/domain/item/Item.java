@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //모든 자식타입을 한번에 처리 왜? 조회빠르고 단순해서 나중에 Join으로 확장시킬 생각
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "item_type")
 public abstract class Item {
     @Id
     @GeneratedValue
