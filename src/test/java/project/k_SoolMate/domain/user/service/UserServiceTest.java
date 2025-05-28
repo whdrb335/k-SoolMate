@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import project.k_SoolMate.domain.address.Address;
-import project.k_SoolMate.domain.user.User;
+import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.repository.UserRepository;
 import project.k_SoolMate.domain.user.request.CreateUserRequest;
@@ -79,6 +79,17 @@ class UserServiceTest {
                 .hasMessageContaining("비밀번호가 맞지 않습니다", HttpStatus.BAD_REQUEST);
     }
 
+    @Test
+    @DisplayName("로그인로직")
+    public void 로그인() throws Exception {
+        //given
+        UserDTO testMember = createTestMember("whdrb3353", "123", "김종규", "01035829211", "whdrb3353@naver.com", new Address("서울", "봉천로", "4442"));
+        //when
+        User userById = getUserById(testMember);
+        //then
+        assertThat(testMember.getLoginId()).isEqualTo(userById.getLoginId());
+        assertThat(bCryptPasswordEncoder.matches("123", userById.getLoginPw())).isTrue();
+    }
     @Test
     @DisplayName("내 정보 조회")
     public void 내정보_조회() throws Exception {
