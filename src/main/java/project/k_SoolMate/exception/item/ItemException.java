@@ -27,4 +27,8 @@ public class ItemException extends RuntimeException{
         super(message, cause, enableSuppression, writableStackTrace);
         this.status = status;
     }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
 }
