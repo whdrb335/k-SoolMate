@@ -17,6 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 생성자 protected로 막고 기본생성자 만들기
+@Table(name = "\"user\"") // 큰따옴표 이스케이프
 public class User {
     @Id @GeneratedValue
     @Column(name = "member_id")
