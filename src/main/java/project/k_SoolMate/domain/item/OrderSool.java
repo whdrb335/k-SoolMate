@@ -59,5 +59,12 @@ public class OrderSool {
         }
     }
 
+    /**
+     * OrderSool 전체 가격 조회
+     */
+    public int getTotalPrice() {
+        return getOrderPrice() + getCount();
+    }
+
 
 }

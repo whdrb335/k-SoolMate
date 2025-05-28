@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import project.k_SoolMate.domain.delivery.Delivery;
 import project.k_SoolMate.domain.item.OrderSool;
 import project.k_SoolMate.domain.user.User;
+import project.k_SoolMate.exception.order.AlreadyCancelOrder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
+
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<OrderSool> orderSools = new ArrayList<>();
 
@@ -53,5 +56,49 @@ public class Order {
         orderSools.add(orderSool);
         orderSool.setOrder(this);
     }
-    
+
+    //==생성 메서드==//
+
+    /**
+     * 주문 생성
+     */
+    public static Order createOrder(User user, Delivery delivery, OrderSool... orderSools) {
+        Order order = new Order();
+        order.user = user;
+        order.delivery = delivery;
+        order.orderStatus = OrderStatus.ORDER;
+        for (OrderSool orderSool : orderSools) {
+            order.addOrderSool(orderSool);
+        }
+        return order;
+    }
+
+    /**
+     * 주문 취소
+     */
+    public void deleteOrder() {
+        if (this.orderStatus == OrderStatus.CANCEL) {
+            throw new AlreadyCancelOrder("이미 취소된 상품 입니다.", HttpStatus.BAD_REQUEST);
+        }
+        this.orderStatus = OrderStatus.CANCEL;
+    }
+
+    /**
+     * 주문 총 금액 조회
+     */
+    public int getTotalPrice() {
+        int totalPrice = 0;
+        for (OrderSool orderSool : orderSools) {
+            totalPrice+= orderSool.getTotalPrice();
+        }
+        return totalPrice;
+    }
+
+    /**
+     * JPA 콜백 메서드로 생성/수정 시간 자동 설정
+     */
+    @PrePersist // 저장 전 자동으로 createAt, updatedAt 설정
+    protected void onCreate() {
+        this.orderDate = LocalDateTime.now();
+    }
 }
