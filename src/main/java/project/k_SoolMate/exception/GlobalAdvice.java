@@ -3,10 +3,13 @@ package project.k_SoolMate.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import project.k_SoolMate.exception.item.ItemException;
 import project.k_SoolMate.exception.order.OrderException;
+import project.k_SoolMate.exception.user.UserException;
 
 @RestControllerAdvice
 @Slf4j // 에러 로그를 찍기위해 이 어노테이션 사용
@@ -26,5 +29,27 @@ public class GlobalAdvice {
     public ResponseEntity<ErrorResult> handlerOrderException(OrderException e) {
         log.error("[OrderException] = {}", e.getMessage());
         return new ResponseEntity<>(new ErrorResult("ORDER_EX", e.getMessage()), e.getStatus());
+    }
+
+    //User 예외도 여기서 ErrorResult로 공통 처리
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ErrorResult> handlerUserException(UserException e) {
+        //에러가 발생시 에러 로그를 찍어볼수있게 로직 생성
+        log.error("[UserException] = {}", e.getMessage());
+        return new ResponseEntity<>(new ErrorResult("USER_EX", e.getMessage()), e.getStatus());
+    }
+
+
+    //나머지 각자의 공통으로 처리되는 로직을 이 밑에 코드로 처리
+    //== 공통된 예외 처리==//
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResult> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse("@Validated 검증을 다시 확인하세요!");
+        return new ResponseEntity<>(new ErrorResult("ValidatedMethodError", errorMessage), HttpStatus.BAD_REQUEST);
     }
 }
