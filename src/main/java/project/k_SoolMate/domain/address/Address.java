@@ -3,10 +3,12 @@ package project.k_SoolMate.domain.address;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Address {
 
     @NotBlank(message = "도시는 필수 입니다.")

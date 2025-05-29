@@ -1,4 +1,4 @@
-package project.k_SoolMate.domain.user.api;
+package project.k_SoolMate.domain.user.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

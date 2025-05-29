@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.k_SoolMate.domain.user.api.LoginUserRequest;
+import project.k_SoolMate.domain.user.request.LoginUserRequest;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.repository.UserRepository;
@@ -14,7 +14,6 @@ import project.k_SoolMate.domain.user.request.UpdateUserRequest;
 import project.k_SoolMate.exception.user.DuplicateUserIdException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
 import project.k_SoolMate.exception.user.NotFoundUserIdException;
-import project.k_SoolMate.exception.user.NotMatchPasswd;
 
 @Service
 // 기본적 DB 읽기전용 (최적화)
