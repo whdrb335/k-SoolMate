@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.k_SoolMate.domain.item.sool.Sool;
-import project.k_SoolMate.domain.order.Order;
+import project.k_SoolMate.domain.order.entity.Order;
 
 @Entity
 @Getter

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.k_SoolMate.domain.address.Address;
-import project.k_SoolMate.domain.order.Order;
+import project.k_SoolMate.domain.order.entity.Order;
 import project.k_SoolMate.exception.user.NotMatchPasswd;
 
 import java.time.LocalDateTime;
