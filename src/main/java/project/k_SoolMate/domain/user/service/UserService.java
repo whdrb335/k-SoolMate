@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.k_SoolMate.domain.address.Address;
 import project.k_SoolMate.domain.user.request.LoginUserRequest;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.dto.UserDTO;
@@ -80,9 +81,9 @@ public class UserService {
      * 내 정보 변경
      */
     @Transactional
-    public UserDTO updateMyInfo(Long id, UpdateUserRequest request) {
+    public UserDTO updateMyInfo(Long id, String phoneNumber, String email, Address address) {
         User user = getUserFindById(id);
-        user.updateUser(request.getPhoneNumber(), request.getEmail(), request.getAddress());
+        user.updateUser(phoneNumber, email, address);
         return new UserDTO(user);
     }
 
