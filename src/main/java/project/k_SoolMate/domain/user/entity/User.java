@@ -67,6 +67,7 @@ public class User {
         user.status = UserStatus.ACTIVE;
         user.phoneNumber = phoneNumber;
         user.email = email;
+        user.address = address;
         return user;
     }
 
