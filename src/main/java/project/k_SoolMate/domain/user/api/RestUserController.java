@@ -8,10 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
 import project.k_SoolMate.domain.user.dto.UserDTO;
-import project.k_SoolMate.domain.user.request.CreateUserRequest;
-import project.k_SoolMate.domain.user.request.LoginUserRequest;
-import project.k_SoolMate.domain.user.request.UpdatePasswdRequest;
-import project.k_SoolMate.domain.user.request.isMatchPasswdRequest;
+import project.k_SoolMate.domain.user.request.*;
 import project.k_SoolMate.domain.user.service.UserService;
 
 import java.util.List;
@@ -75,6 +72,18 @@ public class RestUserController {
         UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
         userService.changePasswd(loginUser.getId(), request.getOldPasswd(), request.getNewPasswd());
         return new Result<>("변경되었습니다.");
+    }
+
+    /**
+     * 유저 업데이트
+     */
+    @PatchMapping("/updateMyInfo")
+    public Result<UserDTO> updateMyInfo(@Validated @RequestBody UpdateUserRequest request, HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO updateDTO = (UserDTO) session.getAttribute("LOGIN_USER");
+        userService.updateMyInfo(updateDTO.getId(), request.getPhoneNumber(), request.getEmail(), request.getAddress());
+        session.setAttribute("LOGIN_USER", updateDTO);
+        return new Result<>(updateDTO);
     }
 
     /**
