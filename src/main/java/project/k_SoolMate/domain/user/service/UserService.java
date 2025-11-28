@@ -15,6 +15,9 @@ import project.k_SoolMate.exception.user.DuplicateUserIdException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
 import project.k_SoolMate.exception.user.NotFoundUserIdException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 // 기본적 DB 읽기전용 (최적화)
 @Transactional(readOnly = true)
@@ -66,6 +69,14 @@ public class UserService {
     }
 
     /**
+     * 유저 전체 조회
+     */
+    public List<UserDTO> getAllUser() {
+        List<UserDTO> list = userRepository.findAll().stream().map(UserDTO::new).toList();
+        return new ArrayList<>(list);
+    }
+
+    /**
      * 내 정보 변경
      */
     @Transactional
@@ -79,13 +90,22 @@ public class UserService {
      * 로그인
      */
     @Transactional
-    public UserDTO login(LoginUserRequest request) {
-        User user = userRepository.findByLoginId(request.getLoginId()).orElseThrow(
+    public UserDTO login(String loginId, String loginPw) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(
                 () -> new NotFoundUserIdException("존재하지 않은 아이디입니다.", HttpStatus.NOT_FOUND));
-        user.isMatchPasswd(request.getLoginPw(),bCryptPasswordEncoder);
+        user.isMatchPasswd(loginPw,bCryptPasswordEncoder);
         return new UserDTO(user);
     }
 
+    /**
+     * 회원 삭제(softDelete)
+     */
+    @Transactional
+    public UserDTO deleteUser(Long id) {
+        User user = getUserFindById(id);
+        user.deleteMember();
+        return new UserDTO(user);
+    }
 
     //==중복 메서드==//
     private User getUserFindById(Long id) {
