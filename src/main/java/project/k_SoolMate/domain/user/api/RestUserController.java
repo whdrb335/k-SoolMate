@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.request.CreateUserRequest;
+import project.k_SoolMate.domain.user.request.LoginUserRequest;
 import project.k_SoolMate.domain.user.request.UpdatePasswdRequest;
 import project.k_SoolMate.domain.user.request.isMatchPasswdRequest;
 import project.k_SoolMate.domain.user.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,37 +27,83 @@ public class RestUserController {
      * 회원 생성
      */
     @PostMapping("/save")
-    public Result<UserDTO> createUser(@Validated @RequestBody CreateUserRequest request, HttpServletRequest httpServletRequest) {
+    public Result<UserDTO> createUser(@Validated @RequestBody CreateUserRequest request) {
         UserDTO user = userService.createUser(request);
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("LOGIN_USER",user);
         return new Result<>(user);
+    }
+
+    /**
+     * 로그인
+     */
+    @PostMapping("/login")
+    public Result<UserDTO> login(@Validated @RequestBody LoginUserRequest request, HttpServletRequest httpServletRequest) {
+        UserDTO loginUser = userService.login(request.getLoginId(), request.getLoginPw());
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("LOGIN_USER", loginUser);
+        return new Result<>(loginUser);
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public Result<String> logout(HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        if (session != null) {
+            session.invalidate();
+        }
+        return new Result<>("로그아웃 되었습니다.");
     }
 
     /**
      * 비밀번호 확인
      */
-    @PostMapping("/isMatchPasswd/{id}")
-    public void isMatchPasswd(@PathVariable("id") Long id, @Validated @RequestBody isMatchPasswdRequest request) {
-        userService.isMatchPasswd(id, request.getPasswd());
+    @PostMapping("/isMatchPasswd")
+    public Result<String> isMatchPasswd(@Validated @RequestBody isMatchPasswdRequest request, HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        userService.isMatchPasswd(loginUser.getId(), request.getPasswd());
+        return new Result<>("일치합니다.");
     }
 
     /**
      * 비밀번호 변경
      */
-    @PatchMapping("/updatePasswd/{id}")
-    public void updatePasswd(@PathVariable("id") Long id, @Validated @RequestBody UpdatePasswdRequest request) {
-        userService.changePasswd(id,request.getOldPasswd(), request.getNewPasswd());
+    @PatchMapping("/updatePasswd")
+    public Result<String> updatePasswd(@Validated @RequestBody UpdatePasswdRequest request, HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        userService.changePasswd(loginUser.getId(), request.getOldPasswd(), request.getNewPasswd());
+        return new Result<>("변경되었습니다.");
     }
 
     /**
      * 내 정보 조회
      */
-    @GetMapping("/myInfo/{id}")
-    public Result<UserDTO> myInfo(@PathVariable("id") Long id) {
-        UserDTO myInfo = userService.getMyInfo(id);
+    @GetMapping("/myInfo")
+    public Result<UserDTO> myInfo(HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        UserDTO myInfo = userService.getMyInfo(loginUser.getId());
         return new Result<>(myInfo);
     }
 
-
+    /**
+     * 전체 회원 조회
+     */
+    @GetMapping("/getAllUser")
+    public Result<List<UserDTO>> getAllUser() {
+        List<UserDTO> allUser = userService.getAllUser();
+        return new Result<>(allUser);
+    }
+    /**
+     * 회원 삭제(softDelete_Status만 변경)
+     */
+    @DeleteMapping("/delete")
+    public Result<String> deleteUser(HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        userService.deleteUser(loginUser.getId());
+        return new Result<>("삭제되었습니다.");
+    }
 }
