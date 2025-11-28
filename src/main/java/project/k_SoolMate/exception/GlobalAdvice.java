@@ -52,4 +52,14 @@ public class GlobalAdvice {
                 .orElse("@Validated 검증을 다시 확인하세요!");
         return new ResponseEntity<>(new ErrorResult("ValidatedMethodError", errorMessage), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResult> handleNPE(NullPointerException e) {
+        log.error("[NullPointerException] = {}", e.getMessage());
+        return new ResponseEntity<>(
+                new ErrorResult("NULL_POINTER", "값이 비어 있어서 처리할 수 없습니다."),
+                HttpStatus.BAD_REQUEST
+    );
+}
+
 }
