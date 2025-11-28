@@ -84,7 +84,8 @@ public class UserService {
     public UserDTO updateMyInfo(Long id, String phoneNumber, String email, Address address) {
         User user = getUserFindById(id);
         user.updateUser(phoneNumber, email, address);
-        return new UserDTO(user);
+        User updateUser = getUserFindById(user.getId());
+        return new UserDTO(updateUser);
     }
 
     /**

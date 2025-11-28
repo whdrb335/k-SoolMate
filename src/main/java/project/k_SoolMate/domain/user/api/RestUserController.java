@@ -81,9 +81,9 @@ public class RestUserController {
     public Result<UserDTO> updateMyInfo(@Validated @RequestBody UpdateUserRequest request, HttpServletRequest httpServletRequest) {
         HttpSession session = httpServletRequest.getSession();
         UserDTO updateDTO = (UserDTO) session.getAttribute("LOGIN_USER");
-        userService.updateMyInfo(updateDTO.getId(), request.getPhoneNumber(), request.getEmail(), request.getAddress());
-        session.setAttribute("LOGIN_USER", updateDTO);
-        return new Result<>(updateDTO);
+        UserDTO userDTO = userService.updateMyInfo(updateDTO.getId(), request.getPhoneNumber(), request.getEmail(), request.getAddress());
+        session.setAttribute("LOGIN_USER", userDTO);
+        return new Result<>(userDTO);
     }
 
     /**
