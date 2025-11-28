@@ -38,6 +38,7 @@ class UserServiceTest {
         //then
         assertThat(testMember.getLoginId()).isEqualTo("whdrb3353");
         assertThat(testMember.getMemberName()).isEqualTo("김종규");
+        assertThat(testMember.getAddress().getCity()).isEqualTo("서울");
     }
 
 
