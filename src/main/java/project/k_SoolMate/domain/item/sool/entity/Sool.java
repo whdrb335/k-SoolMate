@@ -1,4 +1,4 @@
-package project.k_SoolMate.domain.item.sool;
+package project.k_SoolMate.domain.item.sool.entity;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import project.k_SoolMate.domain.item.Item;
 import project.k_SoolMate.domain.item.ItemType;
-import project.k_SoolMate.exception.item.NotEnoughException;
+import project.k_SoolMate.exception.item.NotEnoughStockException;
 
 @Entity
 @Getter
@@ -26,10 +26,10 @@ public class Sool extends Item {
     /**
      * 술 생성
      */
-    public static Sool createSool(String name, String description, ItemType itemType, double alcoholPercent, int price,
+    public static Sool createSool(String name, String description, double alcoholPercent, int price,
                                   int stockQuantity, String origin, String brand) {
         Sool sool = new Sool();
-        sool.setCommonFieldsCreate(name, description, itemType);
+        sool.setCommonFieldsCreate(name, description, ItemType.SOOL);
         sool.alcoholPercent = alcoholPercent;
         sool.price = price;
         sool.stockQuantity = stockQuantity;
@@ -72,7 +72,7 @@ public class Sool extends Item {
         int restStock = this.stockQuantity - count;
         if (restStock < 0) {
             //재고 부족 에러를 HttpStatus랑 같이보낸다.
-            throw new NotEnoughException("재고가 부족합니다.", HttpStatus.BAD_REQUEST);
+            throw new NotEnoughStockException("재고가 부족합니다.", HttpStatus.BAD_REQUEST);
         }
         this.stockQuantity = restStock;
     }
