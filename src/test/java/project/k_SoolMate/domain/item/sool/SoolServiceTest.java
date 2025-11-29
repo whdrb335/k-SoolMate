@@ -137,7 +137,7 @@ public class SoolServiceTest {
         //when
         SoolDTO sool1 = soolService.createSool(createSoolRequest);
         SoolDTO sool2 = soolService.createSool(createSoolRequestV2);
-        List<Sool> all = soolRepository.findAll();
+        List<SoolDTO> all = soolService.getAll();
         //then
         assertThat(all.get(0).getName()).isEqualTo("막걸리");
         assertThat(all.get(1).getName()).isEqualTo("소주");

@@ -1,6 +1,7 @@
 package project.k_SoolMate.domain.item.sool.request;
 
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +15,9 @@ public class CreateSoolRequest {
     private String name;
     @NotBlank(message = "설명은 필수 입니다.")
     private String description;
-    @NotBlank(message = "도수는 필수 입니다.")
     private double alcoholPercent;
     private int price;
-    @NotBlank(message = "가격은 필수 입니다.")
+    @Min(value = 1,message = "최소 1개이상입니다.")
     private int stockQuantity;
     private String origin;
     private String brand;
