@@ -44,10 +44,10 @@ public abstract class Item {
      * 아이템 생성
      */
     //밑에 자식들에게 물려주는 공통적인 필드구성
-    protected void setCommonFieldsCreate(String name, String description, ItemType itemType) {
+    protected void setCommonFieldsCreate(String name, String description, ItemType sool) {
         this.name = name;
         this.description = description;
-        this.itemType = itemType;
+        this.itemType = ItemType.SOOL;
         this.itemStatus = ItemStatus.ACTIVE;
     }
 
