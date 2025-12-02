@@ -35,4 +35,9 @@ public class Delivery {
         delivery.deliveryStatus = DeliveryStatus.READY;
         return delivery;
     }
+
+    public Delivery(Address address) {
+        this.address = address;
+        this.deliveryStatus = DeliveryStatus.READY;
+    }
 }
