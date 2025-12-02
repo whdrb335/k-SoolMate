@@ -76,9 +76,12 @@ public class Order {
     /**
      * 주문 취소
      */
-    public void deleteOrder() {
+    public void cancelOrder() {
         if (this.orderStatus == OrderStatus.CANCEL) {
             throw new AlreadyCancelOrder("이미 취소된 상품 입니다.", HttpStatus.BAD_REQUEST);
+        }
+        for (OrderSool orderSool : orderSools) {
+            orderSool.delete();
         }
         this.orderStatus = OrderStatus.CANCEL;
     }

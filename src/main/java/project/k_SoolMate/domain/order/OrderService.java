@@ -16,6 +16,7 @@ import project.k_SoolMate.domain.order.request.CreateOrderReqeust;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.repository.UserRepository;
 import project.k_SoolMate.exception.item.NotFoundSoolException;
+import project.k_SoolMate.exception.order.NotFoundOrderException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
 
 @Service
@@ -46,5 +47,23 @@ public class OrderService {
         Order order = Order.createOrder(user, delivery, orderSool);
         Order save = orderRepository.save(order);
         return new OrderDTO(save);
+
+    }
+
+    /**
+     * 주문 취소
+     */
+    @Transactional
+    public OrderDTO cancelOrder(Long id) {
+        Order order = getOrderById(id);
+        order.cancelOrder();
+        return new OrderDTO(order);
+    }
+
+
+
+    private Order getOrderById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundOrderException("해당 주문은 존재하지 않습니다.", HttpStatus.BAD_REQUEST));
     }
 }
