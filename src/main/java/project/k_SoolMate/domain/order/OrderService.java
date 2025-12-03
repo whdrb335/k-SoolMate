@@ -54,8 +54,11 @@ public class OrderService {
      * 주문 취소
      */
     @Transactional
-    public OrderDTO cancelOrder(Long id) {
+    public OrderDTO cancelOrder(Long id, Long userId) {
         Order order = getOrderById(id);
+        if (!order.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("본인의 주문만 취소할 수 있습니다.");
+        }
         order.cancelOrder();
         return new OrderDTO(order);
     }
