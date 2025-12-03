@@ -1,5 +1,7 @@
 package project.k_SoolMate.domain.order.request;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -16,7 +18,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateOrderReqeust {
     private Long soolId;
+    @Min(value = 1, message = "최소 한개 이상은 주문하셔야합니다.")
     private int count;
+    @Valid
     private Address address;
 
 }
