@@ -16,8 +16,13 @@ import project.k_SoolMate.domain.order.request.CreateOrderReqeust;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.repository.UserRepository;
 import project.k_SoolMate.exception.item.NotFoundSoolException;
+import project.k_SoolMate.exception.item.OrderOwnerMismatchException;
+import project.k_SoolMate.exception.item.UnauthorizedOrderCancelException;
 import project.k_SoolMate.exception.order.NotFoundOrderException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 // 기본적 DB 읽기전용 (최적화)
@@ -57,12 +62,38 @@ public class OrderService {
     public OrderDTO cancelOrder(Long id, Long userId) {
         Order order = getOrderById(id);
         if (!order.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("본인의 주문만 취소할 수 있습니다.");
+            throw new UnauthorizedOrderCancelException("해당 주문은 본인의 주문이 아닙니다.",HttpStatus.UNAUTHORIZED);
         }
         order.cancelOrder();
         return new OrderDTO(order);
     }
 
+    /**
+     * 주문 단건 조회
+     */
+    public OrderDTO getOrder(Long orderId, Long userId) {
+        Order order = getOrderById(orderId);
+        if (!order.getUser().getId().equals(userId)) {
+            throw new OrderOwnerMismatchException("주문에 접근할 권한이 없습니다.", HttpStatus.UNAUTHORIZED);
+        }
+        return new OrderDTO(order);
+    }
+
+    /**
+     * 주문 전체 조회
+     */
+    public List<OrderDTO> getAllOrders() {
+        List<Order> allWithItems = orderRepository.findAllWithItems();
+        return allWithItems.stream().map(OrderDTO::new).toList();
+    }
+
+    /**
+     * 내 주문 전체 조회
+     */
+    public List<OrderDTO> getMyAllOrders(Long userId) {
+        List<Order> allWithItemsByUserId = orderRepository.findAllWithItemsByUserId(userId);
+        return allWithItemsByUserId.stream().map(OrderDTO::new).toList();
+    }
 
 
     private Order getOrderById(Long id) {
