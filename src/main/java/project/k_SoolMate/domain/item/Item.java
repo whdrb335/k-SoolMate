@@ -66,4 +66,8 @@ public abstract class Item {
         this.itemStatus = ItemStatus.DELETE;
     }
 
+    // === override 추가 === //
+    public abstract String getBrand();
+
+    public abstract double getAlcoholPercent();
 }

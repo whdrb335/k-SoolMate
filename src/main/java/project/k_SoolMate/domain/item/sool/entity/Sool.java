@@ -21,6 +21,18 @@ public class Sool extends Item {
     private String origin;          //제조지역
     private String brand;           //브랜드명
 
+
+    // === override 추가 === //
+    @Override
+    public String getBrand() {
+        return this.brand;
+    }
+
+    @Override
+    public double getAlcoholPercent() {
+        return this.alcoholPercent;
+    }
+
     //==생성 메서드==//
 
     /**

@@ -17,11 +17,13 @@ public class OrderSoolDTO {
     private double alcoholPercent;
 
     public OrderSoolDTO(OrderSool orderSool) {
-        this.soolId = orderSool.getId();
+        this.soolId = orderSool.getItem().getId();
         this.itemName = orderSool.getItem().getName();
         this.orderPrice = orderSool.getOrderPrice();
         this.count = orderSool.getCount();
+        this.brand = orderSool.getItem().getBrand();
         this.totalPrice = orderSool.getOrderPrice() * orderSool.getCount();
+        this.alcoholPercent = orderSool.getItem().getAlcoholPercent();
         // sool 엔티티에서 필요한 정보 추출
     }
 }
