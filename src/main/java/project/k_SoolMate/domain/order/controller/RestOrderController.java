@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
 import project.k_SoolMate.domain.order.OrderService;
 import project.k_SoolMate.domain.order.dto.OrderDTO;
-import project.k_SoolMate.domain.order.entity.OrderStatus;
-import project.k_SoolMate.domain.order.request.CreateOrderReqeust;
+import project.k_SoolMate.domain.order.request.CreateOrderRequest;
 import project.k_SoolMate.domain.user.dto.UserDTO;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +23,10 @@ public class RestOrderController {
      * 주문 생성
      */
     @PostMapping("/create")
-    public Result<OrderDTO> createOrder(@Validated @RequestBody CreateOrderReqeust reqeust, HttpServletRequest httpServletRequest) {
+    public Result<OrderDTO> createOrder(@Validated @RequestBody CreateOrderRequest request, HttpServletRequest httpServletRequest) {
         HttpSession session = httpServletRequest.getSession();
         UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-        OrderDTO order = orderService.createOrder(loginUser.getId(), reqeust);
+        OrderDTO order = orderService.createOrder(loginUser.getId(), request);
         return new Result<>(order);
     }
 
@@ -43,5 +44,20 @@ public class RestOrderController {
     /**
      * 주문 조회(단건 조회)
      */
+    @GetMapping("/{orderId}")
+    public Result<OrderDTO> getOrder(@PathVariable("orderId") Long orderId, HttpServletRequest httpServletRequest) {
+        HttpSession session = httpServletRequest.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        OrderDTO order = orderService.getOrder(orderId, loginUser.getId());
+        return new Result<>(order);
+    }
 
+    /**
+     * 주문 전체조회
+     */
+    @GetMapping
+    public Result<List<OrderDTO>> getAllOrders() {
+        List<OrderDTO> allOrders = orderService.getAllOrders();
+        return new Result<>(allOrders);
+    }
 }

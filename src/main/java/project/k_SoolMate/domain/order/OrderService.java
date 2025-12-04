@@ -12,7 +12,7 @@ import project.k_SoolMate.domain.item.sool.repository.SoolRepository;
 import project.k_SoolMate.domain.order.dto.OrderDTO;
 import project.k_SoolMate.domain.order.entity.Order;
 import project.k_SoolMate.domain.order.repository.OrderRepository;
-import project.k_SoolMate.domain.order.request.CreateOrderReqeust;
+import project.k_SoolMate.domain.order.request.CreateOrderRequest;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.repository.UserRepository;
 import project.k_SoolMate.exception.item.NotFoundSoolException;
@@ -21,7 +21,6 @@ import project.k_SoolMate.exception.item.UnauthorizedOrderCancelException;
 import project.k_SoolMate.exception.order.NotFoundOrderException;
 import project.k_SoolMate.exception.user.NotFoundUserException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,7 +37,7 @@ public class OrderService {
      * 오더 생성
      */
     @Transactional
-    public OrderDTO createOrder(Long id, CreateOrderReqeust request) {
+    public OrderDTO createOrder(Long id, CreateOrderRequest request) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundUserException("해당 사용자가 존재하지 않습니다.", HttpStatus.NOT_FOUND));
         Sool sool = soolRepository.findById(request.getSoolId()).orElseThrow(
