@@ -23,24 +23,6 @@ public class RestSoolController {
     private final SoolService soolService;
 
     /**
-     * 술 생성
-     */
-    @PostMapping("/create")
-    public Result<SoolDTO> createSool(@Validated @RequestBody CreateSoolRequest request) {
-        SoolDTO sool = soolService.createSool(request);
-        return new Result<>(sool);
-    }
-
-    /**
-     * 술 업데이트
-     */
-    @PatchMapping("/{id}")
-    public Result<SoolDTO> updateSool(@PathVariable("id") Long id, @Validated @RequestBody UpdateSoolRequest request) {
-        SoolDTO updateSool = soolService.updateSool(id, request);
-        return new Result<>(updateSool);
-    }
-
-    /**
      * 술 단건 조회
      */
     @GetMapping("/{id}")
@@ -58,12 +40,4 @@ public class RestSoolController {
         return new Result<>(all);
     }
 
-    /**
-     * 술 삭제(softDelete)
-     */
-    @DeleteMapping("/{id}")
-    public Result<SoolDTO> deleteSool(@PathVariable("id") Long id) {
-        SoolDTO soolDTO = soolService.deleteSool(id);
-        return new Result<>(soolDTO);
-    }
 }
