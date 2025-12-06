@@ -20,7 +20,7 @@ import java.util.List;
 @Table(name = "\"user\"") // 큰따옴표 이스케이프
 public class User {
     @Id @GeneratedValue
-    @Column(name = "member_id")
+    @Column(name = "user_id")
     private Long id;
 
     private String loginId;
