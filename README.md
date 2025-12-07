@@ -1,175 +1,180 @@
-🧩 v1 핵심 기능 상세
-1️⃣ User (회원)
-✔ 주요 기능
+🚀 K-SoolMate — 한국 전통주 주문 플랫폼
 
-회원가입 / 회원 정보 수정
+세션 기반 인증 · 전통주 상품 관리 · 주문/배송 관리 · JPA 기반 도메인 설계
+Spring Boot 실무 스타일로 구현한 전통주 주문 플랫폼.
 
-세션 기반 로그인 / 로그아웃
+📌 목차
 
-비밀번호 암호화(BCrypt) + 검증/변경
+프로젝트 소개
 
-soft delete (UserStatus)
+기능 요약
 
-@PrePersist / @PreUpdate 통한 시간 자동화
+v1 핵심 기능 상세
 
-SessionUserDTO로 민감정보 최소화
+ERD 구조
 
-✔ 설계 포인트
+기술 스택
 
-도메인 내부에서 BCrypt 직접 생성 ❌ → Service에서 인코더 주입 후 전달
+실행 방법
 
-getUserFindById()로 중복 제거 + 일관된 예외 처리
+버전 로드맵
 
-인증 실패 시 GlobalAdvice에서 공통 예외 응답 처리
+작성자
 
-2️⃣ Item & Sool (상품)
-✔ 기능
+프로젝트 소개
 
-Item 추상화 + Sool 구현
+K-SoolMate는 한국 전통주를 소개하고 주문할 수 있는
+e-commerce 형태의 백엔드 시스템입니다.
 
-soft delete(ItemStatus)
+도메인 중심 설계
 
-재고 관리 메서드
+세션 기반 인증
 
-increaseStock()
+JPA 연관관계 최적화
 
-decreaseStock()
+N+1 문제 해결
 
-✔ 설계 포인트
+Soft Delete 적용
 
-향후 Goods 등 상품 확장 고려
+기능 요약
+👤 User
 
-주문 연동 시 자동 재고 차감
+회원가입 / 수정 / Soft Delete
 
-3️⃣ Order & OrderSool (주문)
-✔ 주요 기능
+로그인 / 로그아웃 (HttpSession)
 
-주문 생성(create)
+BCrypt 비밀번호 암호화 및 변경
 
-주문 취소(cancel)
+SessionUserDTO로 최소 정보만 세션에 저장
 
-주문 시 재고 자동 감소 → 취소 시 복구
+🍶 Item & Sool
 
-OrderSool 자동 매핑 (Order ↔ Item 중간 테이블 역할)
+Item 추상 클래스 + Sool 구현체
 
-주문 단일 조회 / 전체 조회 API
+재고 증가/감소
 
-✔ 설계 포인트
+soft delete (ItemStatus)
 
-Order 내부 메서드 중심으로 로직을 한곳에 모아 응집도 강화
+🛒 Order
 
-상태 기반(OrderStatus)로 흐름 관리
+주문 생성 / 취소
 
-4️⃣ Delivery (배송)
-✔ 기능
+주문 시 재고 자동 차감
 
-주문 생성 시 Delivery 자동 생성
+OrderSool로 N:M 관계 관리
 
-DeliveryStatus = READY
+단일/전체 주문 조회 API
 
-Order ↔ Delivery 1:1
+🚚 Delivery
 
-✔ Address
+주문 시 자동 생성
 
-Embeddable로 중복 코드 제거
+상태 READY
 
-User, Delivery에서 재사용
+Address Embeddable 재사용
 
-🔥 5️⃣ N+1 문제 해결 (조회 성능 최적화)
-✔ 구현 방식
+⚙ 공통 기능
 
-주문 전체 조회 시
-Order ↔ OrderSool ↔ Item 연관 관계에서 발생하는 N+1 문제를
-fetch join으로 해결
+글로벌 예외 처리(GlobalAdvice)
 
-일괄 로딩 전략으로 쿼리 최소화
+Result API 응답 통일화
 
-대규모 데이터에도 대응 가능한 구조
+인터셉터 기반 로그인 체크
 
-✔ 효과
+Fetch Join으로 N+1 성능 문제 해결
 
-불필요한 반복 쿼리 제거
+v1 핵심 기능 상세
+1️⃣ User 도메인
 
-조회 속도 개선
+회원 생성, 수정, 삭제(soft delete)
 
-성능 병목 지점 해소
+비밀번호 암호화/검증
 
-🔒 6️⃣ 세션 기반 인증 (Session Authentication)
-✔ 구현 기능
+로그인 인증 실패 시 공통 예외 처리
 
-HttpSession 기반 로그인 처리
+엔티티는 비즈니스 로직만 담당하도록 설계
+(BCrypt는 Service에서 주입 → Entity 메서드에 전달)
 
-로그인 사용자만 주문 가능
+2️⃣ Item & Sool 도메인
 
-SessionUserDTO로 세션 저장 최소화
+공통 속성: 가격, 재고, 상태
 
-로그인 여부 체크를 인터셉터에서 공통 처리
+Sool 엔티티로 전통주 구현
 
-🚫 7️⃣ 글로벌 인터셉터 (Interceptor)
-✔ 목적
+재고 증가/감소 메서드 내 도메인 규칙 관리
 
-컨트롤러 단에서 매번 인증 검증 X
+3️⃣ Order 도메인
 
-인터셉터에서 인증 여부 확인 후 차단
+Order.createOrder()로 주문 생성
 
-✔ 구현 특징
+Order.cancel()로 취소 및 재고 복구
 
-인증이 필요한 URL 패턴만 인터셉터 적용
+OrderSool 엔티티로 다대다 매핑 정규화
 
-UnAuthorized 접근 시 공통 예외 발생
+4️⃣ Delivery
 
-인증/인가 로직 분리를 통해 유지보수성 향상
+주문 시 자동 생성
 
-⚠️ 8️⃣ 전역 예외 처리 (GlobalAdvice)
-✔ 구성
+Address를 Embeddable로 재사용
 
-@RestControllerAdvice
+5️⃣ Fetch Join 기반 조회 최적화
 
-UserException / OrderException 등 도메인 예외 처리
+주문 리스트 조회 시
+Order ↔ OrderSool ↔ Item 관계에서 발생하는 N+1 제거
 
-HttpStatus 포함한 통일된 응답 구조
+6️⃣ 세션 인증
 
-모든 API는 Result 형태로 응답
+로그인 시 SessionUserDTO 저장
 
-✔ 예시 응답
+인터셉터에서 로그인 여부 체크
+
+인증 실패 시 공통 메시지 반환
+
+7️⃣ 글로벌 예외 처리
+
+통일된 구조로 예외 응답:
+
 {
   "code": "USER_EX",
   "message": "비밀번호가 맞지 않습니다"
 }
 
-🔄 ERD (v1)
-User 1 --- N Order 1 --- N OrderSool N --- 1 Item
+ERD 구조
+
+(원하면 ERD 이미지 제작해줄게)
+
+User 1 --- N Order
+Order 1 --- N OrderSool
+OrderSool N --- 1 Item
 Order 1 --- 1 Delivery
+
 User --- Address (embedded)
 Delivery --- Address (embedded)
 
-
-(원하면 ERD 이미지로 만들어줄게)
-
-🧪 테스트
-
-도메인 단위 테스트 작성
-
-재고 및 주문 로직 중심 검증
-
-v2에서 통합 테스트 강화
-
-📦 실행 방법
+기술 스택
+구분	사용 기술
+Language	Java 17
+Framework	Spring Boot 3.x
+ORM	Spring Data JPA
+DB	H2 (개발), MySQL 호환
+Build	Gradle
+Others	Lombok, Validation, Spring MVC
+실행 방법
 ./gradlew build
 java -jar build/libs/k-soolmate-0.0.1-SNAPSHOT.jar
 
-🧭 v1 → v2 → v3 로드맵
+버전 로드맵 (v1 → v2 → v3)
 🔹 v2 (기능 확장)
 
 필수
 
-Swagger 문서화
+Swagger 문서 자동화
 
 Admin 권한 분리(Role 기반 인가)
 
-조회 성능 보강(fetch join 추가)
+조회 성능 강화(fetch join 추가)
 
-응답 통일화 구조 강화
+공통 API Response 구조 재정비
 
 선택
 
@@ -177,23 +182,23 @@ Admin 권한 분리(Role 기반 인가)
 
 게시판/댓글
 
-이미지 업로드
+파일 업로드
 
 상품 카테고리
 
-🔹 v3 (배포/보안)
+🔹 v3 (배포 버전)
 
-JWT 인증/인가 적용 (Access / Refresh)
+JWT 인증/인가 (Access/Refresh)
 
 AWS EC2 + RDS 배포
 
-CI/CD (GitHub Actions)
+GitHub Actions CI/CD
 
 Redis 캐싱
 
-모니터링
+서버 모니터링
 
-🙋‍♂️ 작성자
+작성자
 
-김종규
+김종규 (whdrb335)
 GitHub: https://github.com/whdrb335
