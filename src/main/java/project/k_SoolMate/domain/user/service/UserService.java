@@ -122,13 +122,13 @@ public class UserService {
         }
     }
 
-    /**
-     * Admin 유저 로그인
-     */
-    @Transactional
-    public void adminUserLogin(String loginId, String loginPw) {
-        User admin = new User(
-                ""
-        )
-    }
+//    /**
+//     * Admin 유저 로그인
+//     */
+//    @Transactional
+//    public void adminUserLogin(String loginId, String loginPw) {
+//        User admin = new User(
+//                ""
+//        )
+//    }
 }
