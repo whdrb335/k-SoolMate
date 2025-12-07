@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import project.k_SoolMate.domain.address.Address;
 import project.k_SoolMate.domain.user.entity.User;
+import project.k_SoolMate.domain.user.entity.UserRole;
 import project.k_SoolMate.domain.user.entity.UserStatus;
 
 @Getter
@@ -15,7 +16,7 @@ public class UserDTO {
     private String memberName;
     private String email;
     private String phoneNumber;
-    private String role;
+    private UserRole role;
     private Address address;
     private UserStatus userStatus;
 
@@ -25,7 +26,7 @@ public class UserDTO {
         this.memberName = user.getName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-        this.role = user.getRole().name();
+        this.role = user.getRole();
         this.address = user.getAddress();
         this.userStatus = user.getStatus();
     }

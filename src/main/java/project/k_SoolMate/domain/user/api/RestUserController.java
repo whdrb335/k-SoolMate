@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
+import project.k_SoolMate.common.interceptor.SessionUserDTO;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.request.*;
 import project.k_SoolMate.domain.user.service.UserService;
@@ -36,7 +37,9 @@ public class RestUserController {
     public Result<UserDTO> login(@Validated @RequestBody LoginUserRequest request, HttpServletRequest httpServletRequest) {
         UserDTO loginUser = userService.login(request.getLoginId(), request.getLoginPw());
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("LOGIN_USER", loginUser);
+        session.setAttribute("LOGIN_USER", new SessionUserDTO(
+                loginUser.getId(), loginUser.getLoginId(), loginUser.getRole()
+        ));
         return new Result<>(loginUser);
     }
 
