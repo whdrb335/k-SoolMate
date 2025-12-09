@@ -72,6 +72,20 @@ public class User {
     }
 
     /**
+     * 관리자 생성
+     */
+    public static User admin(String loginId, String loginPw, String name, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        User user = new User();
+        user.loginId = loginId;
+        //비밀번호를 암호화시켜서 저장한다.
+        user.loginPw = bCryptPasswordEncoder.encode(loginPw);
+        user.name = name;
+        user.role = UserRole.ADMIN;
+        user.status = UserStatus.ACTIVE;
+        return user;
+    }
+
+    /**
      * 멤버 수정
      */
     public void updateUser(String phoneNumber, String email, Address address) {
