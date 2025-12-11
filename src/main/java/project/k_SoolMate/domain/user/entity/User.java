@@ -37,6 +37,12 @@ public class User {
     private LocalDateTime updatedAt;
     private String phoneNumber;
     private String email;
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders = new ArrayList<>();
