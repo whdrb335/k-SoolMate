@@ -31,7 +31,7 @@ public class UserInitData {
 
         User user = User.createUser(
                 "whdrb3353",
-                "1234",
+                "rhffna12",
                 "김종규",
                 "010-3582-9211",
                 "whdrb3353@naver.com",

@@ -109,6 +109,13 @@ public class UserService {
         return new UserDTO(user);
     }
 
+    public void updateRefreshToken(Long userId, String refreshToken) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    user.updateRefreshToken(refreshToken);
+}
+
     //==중복 메서드==//
     private User getUserFindById(Long id) {
        return userRepository.findById(id)
