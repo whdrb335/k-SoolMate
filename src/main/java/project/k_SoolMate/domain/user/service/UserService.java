@@ -116,6 +116,16 @@ public class UserService {
     user.updateRefreshToken(refreshToken);
 }
 
+    public void validateRefreshToken(Long userId, String token) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getRefreshToken().equals(token)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+    }
+
+
     //==중복 메서드==//
     private User getUserFindById(Long id) {
        return userRepository.findById(id)
