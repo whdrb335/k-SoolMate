@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import project.k_SoolMate.common.Result;
 import project.k_SoolMate.common.jwt.JwtTokenProvider;
 import project.k_SoolMate.common.jwt.RefreshTokenRequest;
@@ -19,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-@Tag(name = "User API", description = "회원가입 · 로그인 · JWT 기반 회원 관리 API")
+@Tag(name = "User API", description = "회원가입 · 로그인 · 인증 · 회원 정보 관리 API")
 public class RestUserController {
 
     private final UserService userService;
@@ -28,7 +29,15 @@ public class RestUserController {
     // ===============================
     // 회원 가입
     // ===============================
-    @Operation(summary = "회원 가입", description = "새로운 회원을 생성합니다.")
+    @Operation(
+            summary = "회원 가입",
+            description = """
+                    새로운 회원을 생성합니다.  
+                    - loginId 중복 여부 검증  
+                    - 전화번호/이메일 형식 검증  
+                    - 생성된 회원 정보를 반환합니다.
+                    """
+    )
     @PostMapping("/save")
     public Result<UserDTO> createUser(@Validated @RequestBody CreateUserRequest request) {
         UserDTO user = userService.createUser(request);
@@ -38,21 +47,27 @@ public class RestUserController {
     // ===============================
     // 로그인 (JWT 발급)
     // ===============================
-    @Operation(summary = "로그인", description = "로그인 후 AccessToken + RefreshToken을 발급합니다.")
+    @Operation(
+            summary = "로그인(JWT 발급)",
+            description = """
+                    사용자 로그인 후 AccessToken + RefreshToken을 발급합니다.  
+                    - 로그인 실패 시 예외 발생  
+                    - RefreshToken은 DB에 저장됩니다.
+                    """
+    )
     @PostMapping("/login")
     public Result<LoginResponse> login(@Validated @RequestBody LoginUserRequest request) {
 
-        // 1) 로그인 검증
         UserDTO loginUser = userService.login(request.getLoginId(), request.getLoginPw());
 
-        // 2) 토큰 발급
-        String accessToken = jwtTokenProvider.createAccessToken(loginUser.getId(), loginUser.getRole().name());
+        String accessToken = jwtTokenProvider.createAccessToken(
+                loginUser.getId(),
+                loginUser.getRole().name()
+        );
         String refreshToken = jwtTokenProvider.createRefreshToken(loginUser.getId());
 
-        // 3) RefreshToken 저장
         userService.updateRefreshToken(loginUser.getId(), refreshToken);
 
-        // 4) 반환
         LoginResponse response = new LoginResponse(
                 loginUser.getId(),
                 loginUser.getLoginId(),
@@ -67,7 +82,14 @@ public class RestUserController {
     // ===============================
     // 비밀번호 확인
     // ===============================
-    @Operation(summary = "비밀번호 확인", description = "현재 로그인한 사용자의 비밀번호가 맞는지 확인합니다.")
+    @Operation(
+            summary = "비밀번호 확인",
+            description = """
+                    현재 로그인한 사용자의 비밀번호가 일치하는지 확인합니다.  
+                    - JWT 인증 필요  
+                    - 비밀번호 미일치 시 예외 발생
+                    """
+    )
     @PostMapping("/isMatchPasswd")
     public Result<String> isMatchPasswd(
             @Validated @RequestBody isMatchPasswdRequest request,
@@ -82,7 +104,14 @@ public class RestUserController {
     // ===============================
     // 비밀번호 변경
     // ===============================
-    @Operation(summary = "비밀번호 변경", description = "기존 비밀번호 검증 후 새 비밀번호로 변경합니다.")
+    @Operation(
+            summary = "비밀번호 변경",
+            description = """
+                    사용자 본인의 기존 비밀번호를 검증한 후, 새 비밀번호로 변경합니다.  
+                    - oldPasswd 불일치 시 예외 발생  
+                    - JWT 인증 필요
+                    """
+    )
     @PatchMapping("/updatePasswd")
     public Result<String> updatePasswd(
             @Validated @RequestBody UpdatePasswdRequest request,
@@ -97,7 +126,14 @@ public class RestUserController {
     // ===============================
     // 내 정보 수정
     // ===============================
-    @Operation(summary = "회원 정보 수정", description = "전화번호, 이메일, 주소를 변경합니다.")
+    @Operation(
+            summary = "내 정보 수정",
+            description = """
+                    회원 본인의 전화번호, 이메일, 주소를 변경합니다.  
+                    - JWT 인증 필요  
+                    - Soft-delete된 유저는 수정할 수 없습니다.
+                    """
+    )
     @PatchMapping("/updateMyInfo")
     public Result<UserDTO> updateMyInfo(
             @Validated @RequestBody UpdateUserRequest request,
@@ -118,7 +154,14 @@ public class RestUserController {
     // ===============================
     // 내 정보 조회
     // ===============================
-    @Operation(summary = "내 정보 조회", description = "JWT 인증 정보를 기반으로 내 정보를 조회합니다.")
+    @Operation(
+            summary = "내 정보 조회",
+            description = """
+                    현재 로그인한 회원 정보를 조회합니다.  
+                    - JWT 인증 필요  
+                    - Soft-delete 시 조회 불가
+                    """
+    )
     @GetMapping("/myInfo")
     public Result<UserDTO> myInfo(HttpServletRequest httpServletRequest) {
 
@@ -131,7 +174,14 @@ public class RestUserController {
     // ===============================
     // 모든 회원 조회 (ADMIN)
     // ===============================
-    @Operation(summary = "전체 회원 조회 (ADMIN 전용)", description = "관리자가 모든 회원 정보를 조회합니다.")
+    @Operation(
+            summary = "전체 회원 조회 (ADMIN 전용)",
+            description = """
+                    관리자 권한이 있는 경우 모든 회원을 조회할 수 있습니다.  
+                    - ADMIN만 호출 가능  
+                    - Soft-delete 포함 여부는 서비스단에서 결정
+                    """
+    )
     @GetMapping("/getAllUser")
     public Result<List<UserDTO>> getAllUser() {
         List<UserDTO> allUser = userService.getAllUser();
@@ -141,7 +191,15 @@ public class RestUserController {
     // ===============================
     // 회원 삭제 (Soft Delete)
     // ===============================
-    @Operation(summary = "회원 삭제(Soft Delete)", description = "사용자를 소프트 삭제 처리합니다.")
+    @Operation(
+            summary = "회원 삭제 (Soft Delete)",
+            description = """
+                    현재 로그인한 사용자를 soft-delete 처리합니다.  
+                    - status = DELETED  
+                    - 재로그인 불가  
+                    - JWT 인증 필요  
+                    """
+    )
     @DeleteMapping("/delete")
     public Result<String> deleteUser(HttpServletRequest httpServletRequest) {
         Long userId = (Long) httpServletRequest.getAttribute("userId");
@@ -150,28 +208,36 @@ public class RestUserController {
         return new Result<>("삭제되었습니다.");
     }
 
+    // ===============================
+    // Refresh Token 재발급
+    // ===============================
+    @Operation(
+            summary = "토큰 재발급(Refresh Token)",
+            description = """
+                    RefreshToken을 이용하여 새로운 AccessToken + RefreshToken을 발급합니다.  
+                    - DB에 저장된 RefreshToken과 비교  
+                    - 만료 또는 위조 시 예외 발생  
+                    - 새 RefreshToken은 DB에 업데이트됩니다.
+                    """
+    )
     @PostMapping("/refresh")
     public Result<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
 
         String clientRefreshToken = request.getRefreshToken();
 
-        // RefreshToken에서 userId 꺼내기
         Long userId = jwtTokenProvider.parseClaims(clientRefreshToken)
                 .get("userId", Long.class);
 
         UserDTO user = userService.getMyInfo(userId);
 
-        // DB에 저장된 refreshToken과 비교
         userService.validateRefreshToken(userId, clientRefreshToken);
 
-        // 새 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(
                 userId,
                 user.getRole().name()
         );
         String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
 
-        // DB에 새로운 RefreshToken 저장
         userService.updateRefreshToken(userId, newRefreshToken);
 
         return new Result<>(
@@ -186,12 +252,20 @@ public class RestUserController {
     }
 
     // ===============================
-    // 회원 로그아웃
+    // 로그아웃
     // ===============================
+    @Operation(
+            summary = "로그아웃",
+            description = """
+                    사용자의 RefreshToken을 삭제하여 로그아웃 처리합니다.  
+                    - JWT 인증 필요  
+                    - AccessToken은 서버가 강제 만료시키지 않지만 사용 불가 처리되도록 구성할 수 있음
+                    """
+    )
     @PostMapping("/logout")
     public Result<String> logout(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
-        userService.updateRefreshToken(userId, null); // Refresh 삭제!
+        userService.updateRefreshToken(userId, null);
         return new Result<>("로그아웃 되었습니다.");
     }
 }
