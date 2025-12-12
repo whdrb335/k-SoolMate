@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
 import project.k_SoolMate.common.jwt.JwtTokenProvider;
+import project.k_SoolMate.common.jwt.RefreshTokenRequest;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.request.*;
 import project.k_SoolMate.domain.user.response.LoginResponse;
@@ -46,7 +47,7 @@ public class RestUserController {
 
         // 2) 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(loginUser.getId(), loginUser.getRole().name());
-        String refreshToken = jwtTokenProvider.createRefreshToken();
+        String refreshToken = jwtTokenProvider.createRefreshToken(loginUser.getId());
 
         // 3) RefreshToken 저장
         userService.updateRefreshToken(loginUser.getId(), refreshToken);
@@ -147,5 +148,50 @@ public class RestUserController {
         userService.deleteUser(userId);
 
         return new Result<>("삭제되었습니다.");
+    }
+
+    @PostMapping("/refresh")
+    public Result<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
+
+        String clientRefreshToken = request.getRefreshToken();
+
+        // RefreshToken에서 userId 꺼내기
+        Long userId = jwtTokenProvider.parseClaims(clientRefreshToken)
+                .get("userId", Long.class);
+
+        UserDTO user = userService.getMyInfo(userId);
+
+        // DB에 저장된 refreshToken과 비교
+        userService.validateRefreshToken(userId, clientRefreshToken);
+
+        // 새 토큰 발급
+        String newAccessToken = jwtTokenProvider.createAccessToken(
+                userId,
+                user.getRole().name()
+        );
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
+
+        // DB에 새로운 RefreshToken 저장
+        userService.updateRefreshToken(userId, newRefreshToken);
+
+        return new Result<>(
+                new LoginResponse(
+                        userId,
+                        user.getLoginId(),
+                        user.getRole().name(),
+                        newAccessToken,
+                        newRefreshToken
+                )
+        );
+    }
+
+    // ===============================
+    // 회원 로그아웃
+    // ===============================
+    @PostMapping("/logout")
+    public Result<String> logout(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        userService.updateRefreshToken(userId, null); // Refresh 삭제!
+        return new Result<>("로그아웃 되었습니다.");
     }
 }
