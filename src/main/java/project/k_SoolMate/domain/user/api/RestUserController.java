@@ -171,22 +171,7 @@ public class RestUserController {
         return new Result<>(myInfo);
     }
 
-    // ===============================
-    // 모든 회원 조회 (ADMIN)
-    // ===============================
-    @Operation(
-            summary = "전체 회원 조회 (ADMIN 전용)",
-            description = """
-                    관리자 권한이 있는 경우 모든 회원을 조회할 수 있습니다.  
-                    - ADMIN만 호출 가능  
-                    - Soft-delete 포함 여부는 서비스단에서 결정
-                    """
-    )
-    @GetMapping("/getAllUser")
-    public Result<List<UserDTO>> getAllUser() {
-        List<UserDTO> allUser = userService.getAllUser();
-        return new Result<>(allUser);
-    }
+
 
     // ===============================
     // 회원 삭제 (Soft Delete)
