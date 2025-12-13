@@ -3,7 +3,6 @@ package project.k_SoolMate.domain.order.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,6 @@ import project.k_SoolMate.common.Result;
 import project.k_SoolMate.domain.order.OrderService;
 import project.k_SoolMate.domain.order.dto.OrderDTO;
 import project.k_SoolMate.domain.order.request.CreateOrderRequest;
-import project.k_SoolMate.domain.user.dto.UserDTO;
 
 import java.util.List;
 
@@ -35,10 +33,8 @@ public class RestOrderController {
             @Validated @RequestBody CreateOrderRequest request,
             HttpServletRequest httpServletRequest) {
 
-        HttpSession session = httpServletRequest.getSession();
-        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-
-        OrderDTO order = orderService.createOrder(loginUser.getId(), request);
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+        OrderDTO order = orderService.createOrder(userId, request);
         return new Result<>(order);
     }
 
@@ -54,10 +50,8 @@ public class RestOrderController {
             @PathVariable("orderId") Long orderId,
             HttpServletRequest httpServletRequest) {
 
-        HttpSession session = httpServletRequest.getSession();
-        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-
-        orderService.cancelOrder(orderId, loginUser.getId());
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
+        orderService.cancelOrder(orderId, userId);
 
         return new Result<>("삭제되었습니다.");
     }
@@ -74,10 +68,9 @@ public class RestOrderController {
             @PathVariable("orderId") Long orderId,
             HttpServletRequest httpServletRequest) {
 
-        HttpSession session = httpServletRequest.getSession();
-        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+        Long userId = (Long) httpServletRequest.getAttribute("userId");
 
-        OrderDTO order = orderService.getOrder(orderId, loginUser.getId());
+        OrderDTO order = orderService.getOrder(orderId, userId);
         return new Result<>(order);
     }
 
