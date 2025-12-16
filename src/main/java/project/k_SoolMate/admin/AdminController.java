@@ -3,6 +3,7 @@ package project.k_SoolMate.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.k_SoolMate.common.Result;
@@ -15,6 +16,7 @@ import project.k_SoolMate.domain.user.service.UserService;
 
 import java.util.List;
 
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin API", description = "관리자 전용: 전통주 관리 및 회원 관리 기능 제공")
 @RestController
 @RequiredArgsConstructor
