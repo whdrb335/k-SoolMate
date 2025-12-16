@@ -32,6 +32,10 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+                // ⭐ 이 두 줄이 핵심
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )

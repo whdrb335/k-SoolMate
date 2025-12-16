@@ -5,8 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import project.k_SoolMate.domain.address.Address;
+import project.k_SoolMate.domain.delivery.Delivery;
+import project.k_SoolMate.domain.item.OrderSool;
 import project.k_SoolMate.domain.item.sool.entity.Sool;
 import project.k_SoolMate.domain.item.sool.repository.SoolRepository;
+import project.k_SoolMate.domain.order.entity.Order;
+import project.k_SoolMate.domain.order.repository.OrderRepository;
 import project.k_SoolMate.domain.user.entity.User;
 import project.k_SoolMate.domain.user.entity.UserRole;
 import project.k_SoolMate.domain.user.repository.UserRepository;
@@ -18,6 +22,7 @@ public class UserInitData {
     private final UserRepository userRepository;
     private final SoolRepository soolRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final OrderRepository orderRepository;
 
     @PostConstruct
     public void init() {
@@ -62,6 +67,14 @@ public class UserInitData {
         soolRepository.save(sool1);
         soolRepository.save(sool2);
 
+        OrderSool orderSool = OrderSool.createOrderSool(sool1, 30000, 5);
+
+        Address address = new Address("서울", "봉천로", "444144");
+        Delivery delivery = Delivery.createDelivery(address);
+        Order order = Order.createOrder(user, delivery, orderSool);
+        orderRepository.save(order);
     }
+
+
 
 }

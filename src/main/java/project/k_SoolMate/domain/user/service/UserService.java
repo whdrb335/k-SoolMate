@@ -96,6 +96,7 @@ public class UserService {
         User user = userRepository.findByLoginId(loginId).orElseThrow(
                 () -> new NotFoundUserIdException("존재하지 않은 아이디입니다.", HttpStatus.NOT_FOUND));
         user.isMatchPasswd(loginPw,bCryptPasswordEncoder);
+        System.out.println("userRole : " + user.getRole());
         return new UserDTO(user);
     }
 
