@@ -11,6 +11,8 @@ import project.k_SoolMate.domain.item.sool.dto.SoolDTO;
 import project.k_SoolMate.domain.item.sool.request.CreateSoolRequest;
 import project.k_SoolMate.domain.item.sool.request.UpdateSoolRequest;
 import project.k_SoolMate.domain.item.sool.service.SoolService;
+import project.k_SoolMate.domain.order.OrderService;
+import project.k_SoolMate.domain.order.dto.OrderDTO;
 import project.k_SoolMate.domain.user.dto.UserDTO;
 import project.k_SoolMate.domain.user.service.UserService;
 
@@ -25,6 +27,7 @@ public class AdminController {
 
     private final SoolService soolService;
     private final UserService userService;
+    private final OrderService orderService;
 
     // ==================
     // 전통주 관리
@@ -100,5 +103,31 @@ public class AdminController {
     public Result<UserDTO> getUser(@PathVariable("id") Long id) {
         UserDTO myInfo = userService.getMyInfo(id);
         return new Result<>(myInfo);
+    }
+
+    /**
+     * 주문 전체 조회
+     */
+    @Operation(
+            summary = "전체 주문 조회 (ADMIN 전용)",
+            description = "모든 주문 내역을 조회합니다. 관리자만 호출 가능하도록 설계하는 것이 일반적입니다."
+    )
+    @GetMapping("/order")
+    public Result<List<OrderDTO>> getAllOrders() {
+        List<OrderDTO> allOrders = orderService.getAllOrders();
+        return new Result<>(allOrders);
+    }
+
+    /**
+     * 주문 단건 조회
+     */
+    @Operation(
+            summary = "단건 주문 조회 (ADMIN 전용)",
+            description = "단건 주문 내역을 조회합니다."
+    )
+    @GetMapping("/order/{orderId}")
+    public Result<AdminOrderDTO> getOrder(@PathVariable("orderId") Long orderId) {
+        AdminOrderDTO adminOrder = orderService.getAdminOrder(orderId);
+        return new Result<>(adminOrder);
     }
 }
