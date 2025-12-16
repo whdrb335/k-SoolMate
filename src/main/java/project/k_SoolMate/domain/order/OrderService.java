@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.k_SoolMate.admin.AdminOrderDTO;
 import project.k_SoolMate.domain.address.Address;
 import project.k_SoolMate.domain.delivery.Delivery;
 import project.k_SoolMate.domain.item.OrderSool;
@@ -78,14 +79,20 @@ public class OrderService {
         return new OrderDTO(order);
     }
 
+//    /**
+//     * 주문 전체 조회
+//     */
+//    public List<OrderDTO> getAllOrders() {
+//        List<Order> allWithItems = orderRepository.findAllWithItems();
+//        return allWithItems.stream().map(OrderDTO::new).toList();
+//    }
     /**
-     * 주문 전체 조회
+     * 주문 전체 조회(N+1 터짐)
      */
     public List<OrderDTO> getAllOrders() {
-        List<Order> allWithItems = orderRepository.findAllWithItems();
-        return allWithItems.stream().map(OrderDTO::new).toList();
+        List<Order> all = orderRepository.findAll();
+        return all.stream().map(OrderDTO::new).toList();
     }
-
     /**
      * 내 주문 전체 조회
      */
@@ -94,6 +101,13 @@ public class OrderService {
         return allWithItemsByUserId.stream().map(OrderDTO::new).toList();
     }
 
+    /**
+     * 관리자 오더 조회
+     */
+    public AdminOrderDTO getAdminOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        return new AdminOrderDTO(order);
+    }
 
     private Order getOrderById(Long id) {
         return orderRepository.findById(id)
