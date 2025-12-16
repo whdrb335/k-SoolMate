@@ -74,16 +74,5 @@ public class RestOrderController {
         return new Result<>(order);
     }
 
-    /**
-     * 주문 전체 조회
-     */
-    @Operation(
-            summary = "전체 주문 조회 (ADMIN 전용)",
-            description = "모든 주문 내역을 조회합니다. 관리자만 호출 가능하도록 설계하는 것이 일반적입니다."
-    )
-    @GetMapping
-    public Result<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> allOrders = orderService.getAllOrders();
-        return new Result<>(allOrders);
-    }
+
 }
