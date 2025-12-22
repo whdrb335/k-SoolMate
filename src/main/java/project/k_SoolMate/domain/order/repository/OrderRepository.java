@@ -6,7 +6,7 @@ import project.k_SoolMate.domain.order.entity.Order;
 
 import java.util.List;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
     /**
      * 주문 전체 조회 (N+1 문제 방지용 fetch join)
      * Order + Delivery + OrderSool + Item 을 한 번에 로딩
