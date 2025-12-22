@@ -52,7 +52,6 @@ public class OrderService {
         Order order = Order.createOrder(user, delivery, orderSool);
         Order save = orderRepository.save(order);
         return new OrderDTO(save);
-
     }
 
     /**
@@ -79,20 +78,20 @@ public class OrderService {
         return new OrderDTO(order);
     }
 
-//    /**
-//     * 주문 전체 조회
-//     */
-//    public List<OrderDTO> getAllOrders() {
-//        List<Order> allWithItems = orderRepository.findAllWithItems();
-//        return allWithItems.stream().map(OrderDTO::new).toList();
-//    }
     /**
-     * 주문 전체 조회(N+1 터짐)
+     * 주문 전체 조회
      */
     public List<OrderDTO> getAllOrders() {
-        List<Order> all = orderRepository.findAll();
-        return all.stream().map(OrderDTO::new).toList();
+        List<Order> allWithItems = orderRepository.findAllWithItems();
+        return allWithItems.stream().map(OrderDTO::new).toList();
     }
+//    /**
+//     * 주문 전체 조회(N+1 터짐)
+//     */
+//    public List<OrderDTO> getAllOrders() {
+//        List<Order> all = orderRepository.findAll();
+//        return all.stream().map(OrderDTO::new).toList();
+//    }
     /**
      * 내 주문 전체 조회
      */
