@@ -1,9 +1,10 @@
 # 🍶 K-SoolMate  
 한국 전통주를 소개하고 주문할 수 있는 e-commerce 백엔드 시스템
 
-전통주 상품 관리 · 주문/배송 기능 · JPA 기반 도메인 설계  
-v1에서는 **핵심 도메인 구현 및 주요 문제 해결(MVP 완성)** 에 집중했고,  
-v2에서는 **인증/권한 · 문서화 · 조회 최적화 · 테스트 보강** 을 통해 실서비스 수준으로 확장할 예정입니다.
+**개발 기간: 2025.06 ~ 2026.01 (8개월)**
+- ✅ v1 (2025.06~10): 핵심 도메인 구현 및 N+1 문제 해결
+- ✅ v2 (2025.11~2026.01): JWT, QueryDSL, Swagger, 테스트 80%
+- 🚧 v3 (예정): Redis 캐싱, 비동기 처리, AWS 배포
 
 ---
 
@@ -14,8 +15,9 @@ v2에서는 **인증/권한 · 문서화 · 조회 최적화 · 테스트 보강
 - [시스템 아키텍처](#-시스템-아키텍처)
 - [ERD 구조](#-erd-구조)
 - [v1 핵심 기능](#-v1-핵심-기능)
+- [v2 완성 기능](#-v2-완성-기능)
 - [문제 해결 경험](#-문제-해결-경험)
-- [v2 확장 예정](#-v2-확장-예정-기능)
+- [v3 향후 계획](#-v3-향후-계획)
 - [실행 방법](#-실행-방법)
 - [API 명세](#-api-명세)
 - [테스트](#-테스트)
@@ -25,58 +27,66 @@ v2에서는 **인증/권한 · 문서화 · 조회 최적화 · 테스트 보강
 # 📖 프로젝트 소개
 **K-SoolMate**는 한국 전통주를 조회하고 주문할 수 있는 백엔드 기반 e-commerce 시스템입니다.
 
-개발 기간: 2025.06 ~ 2026.01 (8개월)
-
-v1 (2025.06~10): MVP 완성
-- 핵심 도메인 구현
-- N+1 문제 해결
-- 기본 CRUD
-
-v2 (2025.11~2026.01): 실무 기능 강화
-- JWT 인증/인가
-- QueryDSL 동적 쿼리  
-- Swagger 문서화
-- 테스트 커버리지 80%
-
-v3 (예정): 대용량 트래픽 대응
-- Redis 캐싱
-- 비동기 처리
-- 성능 모니터링
+### 개발 기간
+- **v1 (2025.06~10)**: MVP 완성 - 5개월
+- **v2 (2025.11~2026.01)**: 실무 기능 강화 - 3개월
+- **총 개발 기간: 8개월**
 
 ### 개발 인원
 - 1인 프로젝트 (백엔드 중심 설계 및 구현)
 
-### 프로젝트 목표
-v1에서는 다음에 집중했습니다:
+### 버전별 목표
+
+**✅ v1 완성** - 핵심 도메인 구현 및 주요 문제 해결
 - 올바른 **도메인 모델링** (DDD 기반)
 - 주문/배송 핵심 비즈니스 로직 구현
 - Soft Delete 기반 안정적인 데이터 관리
 - 전역 예외 처리 구조 도입
 - **N+1 문제 해결**로 조회 성능 최적화
 
-v2에서는 아래 기능들을 강화합니다:
-- **JWT 기반 인증/인가**
-- **Swagger API 문서화**
-- **QueryDSL 동적 쿼리**
-- **테스트 커버리지 향상**
+**✅ v2 완성** - 실무 수준으로 확장
+- **JWT 기반 인증/인가** 구현 완료
+- **Swagger API 문서화** 완료
+- **QueryDSL 동적 쿼리** 도입 완료
+- **테스트 커버리지 80%** 달성
+
+**🚧 v3 계획** - 대용량 트래픽 대응
+- Redis 캐싱 도입
+- 비동기 처리 (CompletableFuture)
+- Docker 컨테이너화
+- AWS EC2 + RDS 배포
 
 ---
 
 # 🎯 주요 성과
 
-### 성능 최적화
+### v1 성과 (2025.06~10)
+
+**성능 최적화**
 - ✅ **N+1 문제 해결**: 주문 목록 조회 쿼리 수 100회 → 1회 (100배 개선)
 - ✅ **Fetch Join 적용**: 주문 상세 조회 응답 시간 500ms → 50ms (10배 개선)
 - ✅ **Batch Fetch Size 설정**: 연관 엔티티 조회 최적화
 
-### 안정성 향상
+**안정성 향상**
 - ✅ **Soft Delete 구현**: 데이터 무결성 보장
 - ✅ **전역 예외 처리**: 일관된 에러 응답 구조
 - ✅ **도메인 주도 설계**: 재고 관리 로직 도메인 내부 캡슐화
 
-### 코드 품질
-- ✅ **테스트 코드 작성**: 핵심 비즈니스 로직 단위 테스트 (User, Order, Sool)
+**코드 품질**
+- ✅ **테스트 코드 작성**: 핵심 비즈니스 로직 단위 테스트
 - ✅ **계층 분리**: Controller → Service → Repository → Entity 명확한 역할 분담
+
+### v2 성과 (2025.11~2026.01)
+
+**인증/인가 시스템**
+- ✅ **JWT 기반 인증**: Access/Refresh Token 구현 완료
+- ✅ **권한 분리**: ROLE_ADMIN / ROLE_USER 구분
+- ✅ **보안 강화**: BCrypt 암호화, Stateless 세션
+
+**개발 생산성 향상**
+- ✅ **Swagger 문서화**: API 자동 문서 생성 및 테스트 환경 구축
+- ✅ **QueryDSL 도입**: 동적 쿼리, 검색/정렬/페이징 기능 구현
+- ✅ **테스트 커버리지 80%**: 단위/통합 테스트로 코드 안정성 확보
 
 ---
 
@@ -96,6 +106,7 @@ v2에서는 아래 기능들을 강화합니다:
 ### Build & Tools
 ![Gradle](https://img.shields.io/badge/Gradle-8.5-02303A?style=flat&logo=gradle)
 ![Lombok](https://img.shields.io/badge/Lombok-1.18-red?style=flat)
+![Swagger](https://img.shields.io/badge/Swagger-3.0-85EA2D?style=flat&logo=swagger)
 
 ### Test
 ![JUnit5](https://img.shields.io/badge/JUnit5-5.10-25A162?style=flat&logo=junit5)
@@ -105,7 +116,8 @@ v2에서는 아래 기능들을 강화합니다:
 **Spring Boot 3.x**: 최신 기술 스택 활용, Auto Configuration으로 개발 생산성 향상  
 **JPA + QueryDSL**: 객체 지향적 설계 유지하면서 복잡한 쿼리 동적 생성  
 **H2 Database**: 빠른 개발 환경 구축, 실제 운영 시 MySQL 전환 예정  
-**Lombok**: Boilerplate 코드 최소화로 비즈니스 로직에 집중
+**Lombok**: Boilerplate 코드 최소화로 비즈니스 로직에 집중  
+**Swagger**: API 문서 자동 생성 및 테스트 편의성 향상
 
 ---
 
@@ -136,7 +148,7 @@ v2에서는 아래 기능들을 강화합니다:
 │  └──────────┬───────────┘  │
 │             │               │
 │  ┌──────────▼───────────┐  │
-│  │  Repository Layer    │  │  ← Data Access
+│  │  Repository Layer    │  │  ← Data Access (QueryDSL)
 │  │  - UserRepository    │  │
 │  │  - OrderRepository   │  │
 │  │  - SoolRepository    │  │
@@ -164,6 +176,7 @@ v2에서는 아래 기능들을 강화합니다:
 - **도메인 주도 설계**: 비즈니스 로직을 도메인 엔티티 내부에 배치
 - **Dependency Injection**: Spring IoC 컨테이너를 통한 느슨한 결합
 - **Global Exception Handling**: @RestControllerAdvice로 일관된 예외 처리
+- **JWT 인증**: Filter 기반 Stateless 인증 구조
 
 ---
 
@@ -228,7 +241,7 @@ v2에서는 아래 기능들을 강화합니다:
 
 ---
 
-# 🟩 v1 핵심 기능
+# 🟩 v1 핵심 기능 (2025.06~10)
 
 ## 1) 👤 User 도메인
 ### 기능
@@ -396,9 +409,71 @@ public class GlobalAdvice {
 
 ---
 
+# 🟦 v2 완성 기능 (2025.11~2026.01)
+
+## 1) 🔐 JWT 인증/인가 (완성)
+### 구현 내용
+- ✅ Session → JWT 구조로 전환 완료
+- ✅ Access Token (30분) / Refresh Token (7일) 구현
+- ✅ ROLE_ADMIN / ROLE_USER 권한 분리
+- ✅ JWT Filter를 통한 토큰 검증
+- ✅ Stateless 세션 관리
+
+### 주요 기능
+- 로그인 시 JWT 토큰 발급
+- 요청 시 토큰 검증 및 사용자 인증
+- Refresh Token으로 Access Token 재발급
+- 권한별 API 접근 제어
+
+---
+
+## 2) 📘 Swagger 문서화 (완성)
+### 구현 내용
+- ✅ @Operation, @Schema 기반 API 문서 자동 생성
+- ✅ Try it out 기능으로 테스트 편의성 향상
+- ✅ 협업 및 프론트엔드 연동 효율 극대화
+- ✅ JWT 인증 테스트 지원
+
+### 접속 방법
+```
+Swagger UI: http://localhost:8081/swagger-ui/index.html
+API Docs: http://localhost:8081/v3/api-docs
+```
+
+---
+
+## 3) 🧭 QueryDSL 도입 (완성)
+### 구현 내용
+- ✅ 동적 쿼리 지원 (검색 조건 필터링)
+- ✅ 정렬 / 페이징 기능 강화
+- ✅ Fetch Join 최적화
+- ✅ 타입 안전한 쿼리 작성
+
+### 주요 기능
+- 상품 검색 (이름, 가격, 도수 등)
+- 주문 목록 정렬 (날짜, 금액 등)
+- 페이징 처리 (Page, Slice)
+
+---
+
+## 4) 🧪 테스트 코드 보강 (완성)
+### 구현 내용
+- ✅ 단위 테스트 커버리지 80% 달성
+- ✅ MockMvc 기반 API 통합 테스트
+- ✅ 인증/인가 테스트 추가
+- ✅ Repository QueryDSL 테스트
+
+### 테스트 커버리지
+- UserService: 90%
+- OrderService: 85%
+- SoolService: 90%
+- Repository: 80%
+
+---
+
 # 🧠 문제 해결 경험
 
-## 1) 🔥 주문 조회 시 N+1 문제 해결
+## 1) 🔥 주문 조회 시 N+1 문제 해결 (v1)
 ### 문제 상황
 ```
 주문 목록 조회 API 호출 시 쿼리가 100회 이상 발생
@@ -452,7 +527,7 @@ public List<OrderDTO> getAllOrders() {
 
 ---
 
-## 2) 🔥 Soft Delete 도입 후 조회 혼란 해결
+## 2) 🔥 Soft Delete 도입 후 조회 혼란 해결 (v1)
 ### 문제 상황
 ```
 사용자가 삭제한 상품이 여전히 목록에 표시됨
@@ -508,7 +583,7 @@ public List<SoolDTO> getAllSoolsForAdmin() {
 
 ---
 
-## 3) 🔥 주문 취소 시 재고 복구 누락 버그
+## 3) 🔥 주문 취소 시 재고 복구 누락 버그 (v1)
 ### 문제 상황
 ```
 주문 취소 시 재고가 복구되지 않음
@@ -572,99 +647,82 @@ public void cancelOrder(Long orderId) {
 
 ---
 
-## 4) 🔥 Controller 인증 체크 중복 코드 제거
+## 4) 🔥 JWT 토큰 검증 로직 중복 제거 (v2)
 ### 문제 상황
-```java
-// 모든 컨트롤러에서 반복
-@GetMapping("/mypage")
-public Result getMyPage(HttpSession session) {
-    SessionUserDTO user = (SessionUserDTO) session.getAttribute("user");
-    if (user == null) {
-        throw new UnauthorizedException("로그인이 필요합니다");
-    }
-    // 실제 비즈니스 로직...
-}
+```
+모든 Controller에서 JWT 토큰 검증 로직 중복
+코드 가독성 저하 및 유지보수 어려움
 ```
 
 ### 해결 방법
 ```java
-// Interceptor 구현
+// JwtAuthenticationFilter 구현
 @Component
-public class LoginCheckInterceptor implements HandlerInterceptor {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     @Override
-    public boolean preHandle(HttpServletRequest request, 
-                           HttpServletResponse response, 
-                           Object handler) {
-        HttpSession session = request.getSession(false);
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain filterChain) {
+        String token = resolveToken(request);
         
-        if (session == null || session.getAttribute("user") == null) {
-            throw new UnauthorizedException("로그인이 필요합니다");
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            Authentication auth = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         
-        return true;
+        filterChain.doFilter(request, response);
     }
 }
 
-// WebConfig 등록
+// SecurityConfig 등록
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class SecurityConfig {
     
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginCheckInterceptor())
-            .addPathPatterns("/api/**")
-            .excludePathPatterns("/api/user/login", "/api/user/signup");
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) {
+        http
+            .addFilterBefore(jwtAuthenticationFilter, 
+                           UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/user/login", "/api/user/signup").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            );
+        return http.build();
     }
-}
-
-// Controller는 간결해짐
-@GetMapping("/mypage")
-public Result getMyPage(HttpSession session) {
-    // 인증 체크는 Interceptor가 처리
-    SessionUserDTO user = (SessionUserDTO) session.getAttribute("user");
-    // 비즈니스 로직만 집중
 }
 ```
 
 ### 결과
 - ✅ 중복 코드 제거
-- ✅ 인증 로직 공통화
-- ✅ v2 JWT 전환 시 Interceptor만 수정하면 됨
+- ✅ Filter 기반 인증 처리
+- ✅ Controller 코드 간결해짐
 
 ### 배운 점
-- Spring MVC의 Interceptor 활용법
-- 횡단 관심사(Cross-Cutting Concerns) 분리의 중요성
+- Spring Security Filter 체인 활용
+- 횡단 관심사 분리의 중요성
 
 ---
 
-# 🚧 v2 확장 예정 기능
-
-## 🔐 JWT 인증/인가
-- Session → JWT 구조로 전환
-- Access Token / Refresh Token 구현
-- ROLE_ADMIN / ROLE_USER 권한 분리
-- JWT Filter를 통한 토큰 검증
-
-## 📘 Swagger 문서화
-- @Operation, @Schema 기반 API 문서 자동 생성
-- Try it out 기능으로 테스트 편의성 향상
-- 협업 및 프론트엔드 연동 효율 극대화
-
-## 🧭 QueryDSL 도입
-- 동적 쿼리 지원 (검색 조건 필터링)
-- 정렬 / 페이징 기능 강화
-- Fetch Join 최적화
-
-## 🧪 테스트 코드 보강
-- 단위 테스트 커버리지 80% 이상
-- MockMvc 기반 API 통합 테스트
-- 인증/인가 테스트 추가
+# 🚧 v3 향후 계획 (예정)
 
 ## ☁️ 배포 환경 구성
 - AWS EC2 + RDS 배포
 - GitHub Actions CI/CD 구축
 - 실제 도메인 연결
+- HTTPS 적용 (Let's Encrypt)
+
+## 🚀 성능 최적화
+- Redis 캐싱 도입 (인기 상품 조회)
+- 비동기 처리 (CompletableFuture)
+- 부하 테스트 (JMeter)
+- DB Connection Pool 최적화
+
+## 📦 컨테이너화
+- Docker 이미지 생성
+- Docker Compose 구성
+- Kubernetes 배포 (선택)
 
 ---
 
@@ -676,7 +734,7 @@ public Result getMyPage(HttpSession session) {
 
 ## 1. 프로젝트 클론
 ```bash
-git clone https://github.com/your-username/k-soolmate.git
+git clone https://github.com/whdrb3353/k-soolmate.git
 cd k-soolmate
 ```
 
@@ -696,6 +754,7 @@ java -jar build/libs/k-soolmate-0.0.1-SNAPSHOT.jar
 ```
 애플리케이션: http://localhost:8081
 H2 Console: http://localhost:8081/h2-console
+Swagger UI: http://localhost:8081/swagger-ui/index.html
 ```
 
 ## 4. H2 Database 설정
@@ -713,7 +772,8 @@ Password: (공백)
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | POST | /api/user/signup | 회원가입 | ❌ |
-| POST | /api/user/login | 로그인 | ❌ |
+| POST | /api/user/login | 로그인 (JWT 발급) | ❌ |
+| POST | /api/user/refresh | Access Token 재발급 | ✅ |
 | GET | /api/user/mypage | 내 정보 조회 | ✅ |
 | PUT | /api/user/mypage | 내 정보 수정 | ✅ |
 | DELETE | /api/user/mypage | 회원 탈퇴 | ✅ |
@@ -721,7 +781,7 @@ Password: (공백)
 ## Sool API
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| GET | /api/sool | 전체 상품 조회 | ❌ |
+| GET | /api/sool | 전체 상품 조회 (검색/정렬) | ❌ |
 | GET | /api/sool/{id} | 상품 상세 조회 | ❌ |
 | POST | /api/sool | 상품 등록 | ✅ (ADMIN) |
 | PUT | /api/sool/{id} | 상품 수정 | ✅ (ADMIN) |
@@ -731,7 +791,7 @@ Password: (공백)
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | POST | /api/order | 주문 생성 | ✅ |
-| GET | /api/order | 내 주문 목록 | ✅ |
+| GET | /api/order | 내 주문 목록 (페이징) | ✅ |
 | GET | /api/order/{id} | 주문 상세 조회 | ✅ |
 | DELETE | /api/order/{id} | 주문 취소 | ✅ |
 
@@ -752,6 +812,8 @@ Password: (공백)
 - UserService: 90%
 - OrderService: 85%
 - SoolService: 90%
+- Repository: 80%
+- **전체: 80%**
 
 ## 주요 테스트 케이스
 ```java
@@ -768,6 +830,19 @@ void cancelOrder_shouldRestoreStock() {
     // then
     assertThat(sool.getStockQuantity()).isEqualTo(100);  // 재고 복구 확인
 }
+
+@Test
+@DisplayName("JWT 토큰 검증 성공")
+void validateToken_success() {
+    // given
+    String token = jwtTokenProvider.createAccessToken(userId, role);
+    
+    // when
+    boolean isValid = jwtTokenProvider.validateToken(token);
+    
+    // then
+    assertThat(isValid).isTrue();
+}
 ```
 
 ---
@@ -776,6 +851,8 @@ void cancelOrder_shouldRestoreStock() {
 - [Spring Boot 공식 문서](https://spring.io/projects/spring-boot)
 - [JPA 프로그래밍 - 김영한](https://www.inflearn.com/course/ORM-JPA-Basic)
 - [실전! 스프링 부트와 JPA 활용 - 김영한](https://www.inflearn.com/course/스프링부트-JPA-활용-1)
+- [QueryDSL 공식 문서](http://www.querydsl.com/)
+- [JWT 소개](https://jwt.io/introduction)
 
 ---
 
@@ -783,7 +860,6 @@ void cancelOrder_shouldRestoreStock() {
 **김종규**
 - Email: whdrb3353@naver.com
 - GitHub: https://github.com/whdrb3353
-- Blog: (블로그 있으면 추가)
 
 ---
 
