@@ -32,6 +32,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // ✅ MySQL (버전 쓰지 마!!)
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
+
+    runtimeOnly 'com.h2database:h2'
     // ✅ QueryDSL (Spring Boot 3 / Jakarta)
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
@@ -51,7 +55,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    runtimeOnly 'com.h2database:h2'
+    // ❌ MySQL 쓸 거면 필요 없음 (로컬 H2 안 쓰면 제거)
+    // runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -62,7 +67,7 @@ tasks.named('test') {
 }
 
 /* =========================================================
-   🔥 QueryDSL Q 클래스 생성 경로 설정 (이게 핵심)
+   🔥 QueryDSL Q 클래스 생성 경로 설정 (완벽함, 그대로 유지)
    ========================================================= */
 
 def querydslDir = "$buildDir/generated/querydsl"
