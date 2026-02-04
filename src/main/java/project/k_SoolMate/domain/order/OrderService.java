@@ -79,19 +79,28 @@ public class OrderService {
     }
 
     /**
-     * 주문 전체 조회
+     * 주문 전체 조회(AFTER)
      */
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderDTO> getAllOrdersWithFetch() {
         List<Order> allWithItems = orderRepository.findAllWithItems();
         return allWithItems.stream().map(OrderDTO::new).toList();
     }
-//    /**
-//     * 주문 전체 조회(N+1 터짐)
-//     */
-//    public List<OrderDTO> getAllOrders() {
-//        List<Order> all = orderRepository.findAll();
-//        return all.stream().map(OrderDTO::new).toList();
-//    }
+
+    /**
+     * N+1 터지는 주문 전체 조회(BEFORE)
+     */
+    public List<OrderDTO> getAllOrdersWithoutFetch() {
+        List<Order> allWithoutFetch = orderRepository.findAllWithoutFetch();
+        return allWithoutFetch.stream().map(OrderDTO::new).toList();
+    }
+
+    /**
+     * 주문 전체 조회(N+1 터짐)
+     */
+    public List<OrderDTO> getAllOrders() {
+        List<Order> all = orderRepository.findAll();
+        return all.stream().map(OrderDTO::new).toList();
+    }
     /**
      * 내 주문 전체 조회
      */

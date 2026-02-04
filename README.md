@@ -5,7 +5,7 @@
 **개발 기간:** 2025.06 ~ 2026.01 (8개월)
 
 - ✅ v1 (2025.06~10): 핵심 도메인 구현 및 N+1 문제 해결
-- ✅ v2 (2025.11~2026.01): JWT, QueryDSL, Swagger, 테스트 80%
+- ✅ v2 (2025.11~2026.01): JWT, QueryDSL, Swagger, 테스트 80%, **성능 검증**
 - 🚧 v3 (예정): Redis 캐싱, 비동기 처리, AWS 재배포
 
 ---
@@ -14,6 +14,7 @@
 
 - [프로젝트 소개](#프로젝트-소개)
 - [주요 성과](#주요-성과)
+- [성능 테스트 및 병목 개선](#성능-테스트-및-병목-개선)
 - [기술 스택](#기술-스택)
 - [시스템 아키텍처](#시스템-아키텍처)
 - [ERD 구조](#erd-구조)
@@ -54,6 +55,7 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 - Swagger API 문서화 완료
 - QueryDSL 동적 쿼리 도입 완료
 - 테스트 커버리지 80% 달성
+- **k6 부하 테스트로 성능 병목 검증 및 개선**
 
 #### 🚧 v3 계획 - 대용량 트래픽 대응 및 재배포
 - Redis 캐싱 도입
@@ -105,6 +107,183 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 - ✅ **QueryDSL 도입**: 동적 쿼리, 검색/정렬/페이징 기능 구현
 - ✅ **테스트 커버리지 80%**: 단위/통합 테스트로 코드 안정성 확보
 
+#### 성능 검증 및 개선
+- ✅ **k6 부하 테스트**: 동시 사용자 30명 기준 성능 병목 측정
+- ✅ **p95 응답 시간**: 4.31s → 66.52ms (약 98% 개선)
+- ✅ **처리량 향상**: RPS 7.6 → 29.0 (약 3.8배 증가)
+
+---
+
+## 📊 성능 테스트 및 병목 개선
+
+### 테스트 개요
+- **도구**: k6 (오픈소스 부하 테스트 도구)
+- **환경**: Local 환경, 동시 사용자 30명, 20초 지속 요청
+- **대상 API**: 주문 전체 조회 API (`GET /api/admin/order`)
+- **테스트 데이터**: 1,000건 이상의 주문 데이터
+
+### 테스트 시나리오 설계
+
+```javascript
+// k6 부하 테스트 스크립트
+export let options = {
+  vus: 30,          // 동시 사용자 30명
+  duration: '20s',  // 20초 동안 지속
+};
+
+export default function () {
+  http.get('http://localhost:8081/api/test/order/before');
+  sleep(1);
+}
+```
+
+### 측정 결과 비교
+
+#### 🔴 BEFORE (N+1 발생)
+```
+주요 지표:
+- avg response time: 2.09s
+- p95 response time: 4.31s
+- max response time: 10.17s
+- RPS (requests/sec): 7.6
+
+문제점:
+- Order 조회 → Delivery N회 조회 → OrderSool N회 조회 → Item N회 조회
+- 1 + N + N 쿼리 패턴으로 인한 DB 커넥션 폭증
+- 동시 요청 증가 시 응답 시간 기하급수적 증가
+```
+
+#### 🟢 AFTER (Fetch Join 적용)
+```
+주요 지표:
+- avg response time: 33.32ms
+- p95 response time: 66.52ms
+- max response time: 198.28ms
+- RPS (requests/sec): 29.0
+
+개선 사항:
+- JPQL Fetch Join으로 연관 엔티티를 한 번에 로딩
+- 쿼리 1건으로 통합하여 DB 부하 대폭 감소
+- 안정적인 응답 시간 유지
+```
+
+### 개선 효과 요약
+
+| 지표 | BEFORE | AFTER | 개선율 |
+|------|--------|-------|--------|
+| **평균 응답 시간** | 2.09s | 33.32ms | **98.4% ↓** |
+| **p95 응답 시간** | 4.31s | 66.52ms | **98.5% ↓** |
+| **최대 응답 시간** | 10.17s | 198.28ms | **98.0% ↓** |
+| **처리량 (RPS)** | 7.6 | 29.0 | **281% ↑** |
+
+### 검증 과정 설계
+
+#### 1️⃣ 테스트 환경 분리
+```java
+// 운영 API와 완전히 분리된 테스트 전용 컨트롤러
+@RestController
+@RequestMapping("/api/test")
+public class OrderLoadTestController {
+    
+    @GetMapping("/order/before")  // N+1 발생 버전
+    public List<OrderDTO> before() {
+        return orderService.getAllOrdersWithoutFetch();
+    }
+    
+    @GetMapping("/order/after")   // Fetch Join 적용 버전
+    public List<OrderDTO> after() {
+        return orderService.getAllOrdersWithFetch();
+    }
+}
+```
+
+#### 2️⃣ 테스트 데이터 생성
+```java
+// 실서비스 도메인 로직(재고 차감)과 분리된 테스트용 생성 메서드
+@Service
+public class TestOrderService {
+    
+    @Transactional
+    public void bulkCreateOrders(int count) {
+        for (int i = 0; i < count; i++) {
+            // 재고 차감 없이 주문 데이터만 생성
+            OrderSool orderSool = 
+                OrderSool.createOrderSoolForTest(sool, price, 1);
+            Order order = Order.createOrder(user, delivery, orderSool);
+            orderRepository.save(order);
+        }
+    }
+}
+```
+
+#### 3️⃣ BEFORE/AFTER 비교 측정
+- **BEFORE**: `findAllWithoutFetch()` 사용 → N+1 발생
+- **AFTER**: `findAllWithItems()` 사용 → Fetch Join 적용
+- **동일 조건**: 같은 데이터, 같은 부하, 같은 환경
+
+### 기술적 개선 사항
+
+#### Repository 계층
+```java
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    
+    // 🔴 BEFORE: N+1 발생
+    @Query("select o from Order o")
+    List<Order> findAllWithoutFetch();
+    
+    // 🟢 AFTER: Fetch Join 적용
+    @Query("""
+        select distinct o from Order o
+        join fetch o.delivery
+        join fetch o.orderSools os
+        join fetch os.item
+    """)
+    List<Order> findAllWithItems();
+}
+```
+
+#### Service 계층
+```java
+@Service
+@Transactional(readOnly = true)
+public class OrderService {
+    
+    // BEFORE 버전
+    public List<OrderDTO> getAllOrdersWithoutFetch() {
+        List<Order> orders = orderRepository.findAllWithoutFetch();
+        return orders.stream()
+            .map(OrderDTO::new)  // 여기서 N+1 발생
+            .toList();
+    }
+    
+    // AFTER 버전
+    public List<OrderDTO> getAllOrdersWithFetch() {
+        List<Order> orders = orderRepository.findAllWithItems();
+        return orders.stream()
+            .map(OrderDTO::new)  // 이미 로딩된 데이터 사용
+            .toList();
+    }
+}
+```
+
+### 주요 학습 포인트
+
+#### 1. 성능 측정의 중요성
+- 추측이 아닌 **실제 측정**을 통한 병목 확인
+- p95, p99 같은 **퍼센타일 지표**의 중요성 이해
+- 평균보다 **최악의 경우(max)**를 고려한 설계
+
+#### 2. 테스트 환경 설계
+- 운영 코드와 **완전히 분리된 테스트 API** 구성
+- 실서비스 도메인 로직(재고 차감)을 **침범하지 않는 설계**
+- 동일 조건 비교를 위한 **재현 가능한 테스트 시나리오**
+
+#### 3. 실무형 문제 해결 프로세스
+- **문제 인식** → N+1 쿼리 패턴 식별
+- **재현 및 측정** → k6 부하 테스트로 병목 수치화
+- **개선** → JPQL Fetch Join 적용
+- **검증** → 동일 조건에서 재측정 및 비교
+
 ---
 
 ## 🛠 기술 스택
@@ -125,6 +304,9 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 ![Lombok](https://img.shields.io/badge/Lombok-BC4521?style=flat)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=black)
 
+### Performance Testing
+![k6](https://img.shields.io/badge/k6-7D64FF?style=flat&logo=k6&logoColor=white)
+
 ### Infrastructure
 ![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=flat&logo=amazonec2&logoColor=white)
 ![AWS RDS](https://img.shields.io/badge/AWS%20RDS-527FFF?style=flat&logo=amazonrds&logoColor=white)
@@ -136,6 +318,7 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 ### 선택 이유
 - **Spring Boot 3.x**: 최신 기술 스택 활용, Auto Configuration으로 개발 생산성 향상
 - **JPA + QueryDSL**: 객체 지향적 설계 유지하면서 복잡한 쿼리 동적 생성
+- **k6**: 경량화된 부하 테스트 도구, 스크립트 기반 시나리오 작성 용이
 - **H2 Database**: 빠른 개발 환경 구축, 실제 운영 시 MySQL 전환 예정
 - **AWS EC2 + RDS**: 클라우드 인프라 구축 및 배포 경험
 - **Lombok**: Boilerplate 코드 최소화로 비즈니스 로직에 집중
@@ -498,7 +681,7 @@ public class GlobalAdvice {
 
 ## 🧠 문제 해결 경험
 
-### 1) 🔥 주문 조회 시 N+1 문제 해결 (v1)
+### 1) 🔥 주문 조회 시 N+1 문제 해결 및 성능 검증 (v1~v2)
 
 #### 문제 상황
 주문 목록 조회 API 호출 시 쿼리가 100회 이상 발생
@@ -540,15 +723,27 @@ public List<OrderDTO> getAllOrders() {
 }
 ```
 
-#### 결과
-- ✅ **쿼리 수**: 100회 → 1회 (100배 개선)
-- ✅ **응답 시간**: 500ms → 50ms (10배 개선)
-- ✅ **DB 부하 대폭 감소**
+#### 성능 검증 프로세스 (v2 추가)
+
+**1. 테스트 환경 구성**
+- 테스트 전용 API (`/api/test`) 분리
+- 1,000건 이상의 더미 주문 데이터 생성
+- 실서비스 도메인 로직과 분리된 테스트용 메서드 설계
+
+**2. 부하 테스트 수행**
+- k6로 동시 사용자 30명, 20초 지속 요청
+- BEFORE/AFTER 동일 조건에서 측정
+
+**3. 측정 결과**
+- **BEFORE**: p95 4.31s, RPS 7.6
+- **AFTER**: p95 66.52ms, RPS 29.0
+- **개선율**: p95 기준 약 98% 감소, 처리량 3.8배 향상
 
 #### 배운 점
 - JPA Lazy Loading의 한계와 Fetch Join의 필요성 이해
-- JPQL을 통한 최적화 경험
-- 성능 측정의 중요성 (JPA 쿼리 로깅 활용)
+- **추측이 아닌 실제 측정을 통한 성능 검증의 중요성**
+- **p95, p99 같은 퍼센타일 지표로 최악의 경우를 고려한 설계**
+- 테스트 환경 분리를 통한 실서비스 영향 최소화
 
 ---
 
@@ -845,7 +1040,7 @@ $ curl http://13.209.6.194:8081/api/user/test
 ### 🚀 성능 최적화 (v3)
 - Redis 캐싱 도입 (인기 상품 조회)
 - 비동기 처리 (CompletableFuture)
-- 부하 테스트 (JMeter)
+- 부하 테스트 확장 (JMeter)
 - DB Connection Pool 최적화
 
 ---
@@ -977,6 +1172,7 @@ void validateToken_success() {
 - [실전! 스프링 부트와 JPA 활용 - 김영한](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8-JPA-%ED%99%9C%EC%9A%A9-1)
 - [QueryDSL 공식 문서](http://querydsl.com/)
 - [JWT 소개](https://jwt.io/introduction)
+- [k6 Documentation](https://k6.io/docs/)
 
 ---
 
@@ -995,4 +1191,4 @@ This project is licensed under the MIT License
 
 ---
 
-**마지막 업데이트**: 2026.01.27
+**마지막 업데이트**: 2026.02.04

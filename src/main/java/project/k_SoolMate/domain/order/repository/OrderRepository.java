@@ -17,6 +17,10 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
             "join fetch os.item i")
     List<Order> findAllWithItems();
 
+    // BEFORE(비교용)
+    @Query("select o from Order o")
+    List<Order> findAllWithoutFetch();
+
     /**
      * 내 주문 전체 조회 (N+1 문제 방지용 fetch join)
      * Order + Delivery + OrderSool + Item 을 한 번에 로딩
