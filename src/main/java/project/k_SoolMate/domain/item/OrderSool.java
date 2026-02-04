@@ -51,6 +51,17 @@ public class OrderSool {
     }
 
     /**
+     * 테스트용 생성자
+     */
+    public static OrderSool createOrderSoolForTest(Sool sool, int orderPrice, int count) {
+        OrderSool orderSool = new OrderSool();
+        orderSool.setItem(sool);
+        orderSool.orderPrice = orderPrice;
+        orderSool.count = count;
+        return orderSool;
+    }
+
+    /**
      * 취소시 재고증가
      */
     public void delete() {

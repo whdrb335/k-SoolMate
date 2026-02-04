@@ -18,7 +18,7 @@ import project.k_SoolMate.domain.user.service.UserService;
 
 import java.util.List;
 
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin API", description = "관리자 전용: 전통주 관리 및 회원 관리 기능 제공")
 @RestController
 @RequiredArgsConstructor
@@ -106,15 +106,41 @@ public class AdminController {
     }
 
     /**
-     * 주문 전체 조회
+     * 주문 전체 조회(AFTER)
      */
     @Operation(
-            summary = "전체 주문 조회 (ADMIN 전용)",
+            summary = "전체 주문 조회 (ADMIN 전용), n+1 fetch 해결버젼",
             description = "모든 주문 내역을 조회합니다. 관리자만 호출 가능하도록 설계하는 것이 일반적입니다."
     )
     @GetMapping("/order")
     public Result<List<OrderDTO>> getAllOrders() {
         List<OrderDTO> allOrders = orderService.getAllOrders();
+        return new Result<>(allOrders);
+    }
+
+    /**
+     * 주문 전체 조회(BEFORE)
+     */
+    @Operation(
+            summary = "전체 주문 조회 (ADMIN 전용), n+1 터지는 버젼",
+            description = "모든 주문 내역을 조회합니다. 관리자만 호출 가능하도록 설계하는 것이 일반적입니다."
+    )
+    @GetMapping("/order/test/before")
+    public Result<List<OrderDTO>> getAllOrdersWithoutFetch() {
+        List<OrderDTO> allOrders = orderService.getAllOrdersWithoutFetch();
+        return new Result<>(allOrders);
+    }
+
+    /**
+     * 주문 전체 조회(BEFORE)
+     */
+    @Operation(
+            summary = "전체 주문 조회 (ADMIN 전용), n+1 안터지는 버젼",
+            description = "모든 주문 내역을 조회합니다. 관리자만 호출 가능하도록 설계하는 것이 일반적입니다."
+    )
+    @GetMapping("/order/test/after")
+    public Result<List<OrderDTO>> getAllOrdersWithFetch() {
+        List<OrderDTO> allOrders = orderService.getAllOrdersWithFetch();
         return new Result<>(allOrders);
     }
 
