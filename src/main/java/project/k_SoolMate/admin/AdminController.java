@@ -114,7 +114,7 @@ public class AdminController {
     )
     @GetMapping("/order")
     public Result<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> allOrders = orderService.getAllOrders();
+        List<OrderDTO> allOrders = orderService.getAllOrdersWithFetch();
         return new Result<>(allOrders);
     }
 
