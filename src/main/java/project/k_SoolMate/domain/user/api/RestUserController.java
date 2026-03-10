@@ -38,7 +38,7 @@ public class RestUserController {
                     - 생성된 회원 정보를 반환합니다.
                     """
     )
-    @PostMapping("/save")
+    @PostMapping("/signup")
     public Result<UserDTO> createUser(@Validated @RequestBody CreateUserRequest request) {
         UserDTO user = userService.createUser(request);
         return new Result<>(user);
