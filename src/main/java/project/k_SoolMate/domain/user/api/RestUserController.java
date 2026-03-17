@@ -210,8 +210,9 @@ public class RestUserController {
 
         String clientRefreshToken = request.getRefreshToken();
 
-        Long userId = jwtTokenProvider.parseClaims(clientRefreshToken)
-                .get("userId", Long.class);
+//        Long userId = jwtTokenProvider.parseClaims(clientRefreshToken)
+//                .get("userId", Long.class);
+        Long userId = Long.parseLong(jwtTokenProvider.parseClaims(clientRefreshToken).getSubject());
 
         UserDTO user = userService.getMyInfo(userId);
 
