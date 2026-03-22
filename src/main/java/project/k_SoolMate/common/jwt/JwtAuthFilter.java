@@ -33,9 +33,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
-            authentication.getAuthorities().forEach(auth ->
-        System.out.println("### AUTHORITY = " + auth.getAuthority()));
-        }
+
+            // ⭐ 이 부분 추가
+            Claims claims = jwtTokenProvider.parseClaims(token);
+            Long userId = Long.parseLong(claims.getSubject());
+            request.setAttribute("userId", userId);
+}
 
         filterChain.doFilter(request, response);
     }
