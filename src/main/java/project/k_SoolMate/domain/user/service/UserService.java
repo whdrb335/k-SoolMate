@@ -110,6 +110,7 @@ public class UserService {
         return new UserDTO(user);
     }
 
+    @Transactional
     public void updateRefreshToken(Long userId, String refreshToken) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -117,6 +118,7 @@ public class UserService {
     user.updateRefreshToken(refreshToken);
 }
 
+    @Transactional
     public void validateRefreshToken(Long userId, String token) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
