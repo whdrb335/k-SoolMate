@@ -1182,6 +1182,17 @@ void validateToken_success() {
 
 ---
 
+## 🤝 협업
+
+| 역할 | 담당자 | 기술 스택 |
+|------|--------|-----------|
+| Backend | 김종규 | Java, Spring Boot, MySQL, Docker, AWS EC2 |
+| Frontend | 김재욱 | Next.js, TypeScript |
+
+- Swagger UI로 API 명세 공유
+- Discord 실시간 소통
+- EC2 배포 환경에서 실제 API 연동 테스트 진행 중
+
 ## 👨‍💻 작성자
 
 **김종규**
@@ -1197,4 +1208,4 @@ This project is licensed under the MIT License
 
 ---
 
-**마지막 업데이트**: 2026.02.04
+**마지막 업데이트**: 2026.03.31
