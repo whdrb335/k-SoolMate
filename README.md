@@ -6,7 +6,7 @@
 
 - ✅ v1 (2025.06~10): 핵심 도메인 구현 및 N+1 문제 해결
 - ✅ v2 (2025.11~2026.01): JWT, QueryDSL, Swagger, 테스트 80%, **성능 검증**
-- 🚧 v3 (예정): Redis 캐싱, 비동기 처리, AWS 재배포
+- 🚧 v3 (진행중): Docker EC2 배포 완료, Next.js 프론트엔드 협업 중, Redis 캐싱 예정
 
 ---
 
@@ -38,7 +38,7 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 - **총 개발 기간: 8개월**
 
 ### 개발 인원
-- 1인 프로젝트 (백엔드 중심 설계 및 구현)
+- 1인 프로젝트 (백엔드 중심 설계 및 구현) 하지만 지금 프론트엔드와 협업중
 
 ### 버전별 목표
 
@@ -57,12 +57,10 @@ K-SoolMate는 한국 전통주를 조회하고 주문할 수 있는 백엔드 �
 - 테스트 커버리지 80% 달성
 - **k6 부하 테스트로 성능 병목 검증 및 개선**
 
-#### 🚧 v3 계획 - 대용량 트래픽 대응 및 재배포
-- Redis 캐싱 도입
-- 비동기 처리 (CompletableFuture)
-- Docker 컨테이너화
-- AWS 재배포 또는 대체 플랫폼 배포
-
+#### 🚧 v3 진행중
+- Docker 컨테이너화 완료
+- AWS EC2 Docker 기반 재배포 운영 중
+- Next.js 프론트엔드 개발자와 실제 API 연동 협업 진행 중
 ---
 
 ## 🎯 주요 성과
@@ -289,31 +287,22 @@ public class OrderService {
 ## 🛠 기술 스택
 
 ### Backend
-![Java](https://img.shields.io/badge/Java-17-007396?style=flat&logo=java&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=flat&logo=springboot&logoColor=white)
-![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat&logo=springsecurity&logoColor=white)
+[Java], [SpringBoot], [SpringSecurity]
 
 ### Database & ORM
-![H2](https://img.shields.io/badge/H2-Database-blue?style=flat)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
-![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?style=flat&logo=hibernate&logoColor=white)
-![QueryDSL](https://img.shields.io/badge/QueryDSL-0078D4?style=flat)
+[H2], [MySql], [JPA], [QuertDSL]
 
 ### Build & Tools
-![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white)
-![Lombok](https://img.shields.io/badge/Lombok-BC4521?style=flat)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=black)
+[Gradle], [Lombok], [Swagger]
 
 ### Performance Testing
-![k6](https://img.shields.io/badge/k6-7D64FF?style=flat&logo=k6&logoColor=white)
+[k6]
 
 ### Infrastructure
-![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=flat&logo=amazonec2&logoColor=white)
-![AWS RDS](https://img.shields.io/badge/AWS%20RDS-527FFF?style=flat&logo=amazonrds&logoColor=white)
+[EC2], [Docker]
 
 ### Test
-![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white)
-![AssertJ](https://img.shields.io/badge/AssertJ-25A162?style=flat)
+[JUnit5], [AssertJ]
 
 ### 선택 이유
 - **Spring Boot 3.x**: 최신 기술 스택 활용, Auto Configuration으로 개발 생산성 향상
@@ -1005,7 +994,31 @@ $ curl http://13.209.6.194:8081/api/user/test
   4. 문제 원인 특정 후 해결
 
 ---
+### 6) 🔥 프론트 협업 중 JWT 버그 3건 발견 및 수정 (v3)
 
+#### 문제 상황
+Next.js 프론트엔드 개발자와 API 연동 중 Postman 단독 테스트에서는 발견하지 못했던 버그 3건 발생
+
+#### 버그 1: RefreshToken 파싱 시 userId null
+- **문제**: `/api/user/refresh` 호출 시 `The given id must not be null` 500 에러
+- **원인**: `createRefreshToken()`은 userId를 `subject`에 저장했으나 파싱 시 존재하지 않는 `"userId"` 클레임을 꺼내 null 반환
+- **해결**: `parseClaims().get("userId")` → `parseClaims().getSubject()`로 수정
+
+#### 버그 2: JwtAuthFilter에서 userId 미전달
+- **문제**: `/api/order/create` 등 인증 필요 API에서 userId가 null
+- **원인**: JwtAuthFilter에서 SecurityContext에만 인증 정보를 세팅하고 `request.setAttribute("userId")` 누락
+- **해결**: 필터에서 claims 파싱 후 userId를 request attribute에 세팅
+
+#### 버그 3: @Transactional 누락으로 DB 미반영
+- **문제**: 로그인 후 refresh 호출 시 `getRefreshToken() is null`
+- **원인**: `updateRefreshToken()` 메서드에 `@Transactional` 누락으로 dirty checking 미작동
+- **해결**: `@Transactional` 추가
+
+#### 배운 점
+- 단독 테스트에서 발견하지 못한 버그가 실제 협업 연동에서 드러남
+- 실제 프론트엔드와 붙여보는 과정이 QA 역할을 한다는 것을 체감
+- 로그 기반 원인 추적 → 코드 수정 → 재배포 사이클 경험
+- 
 ## 🚧 v3 향후 계획
 
 ### ☁️ 배포 이력 및 계획
@@ -1029,13 +1042,6 @@ $ curl http://13.209.6.194:8081/api/user/test
 - EC2 보안 그룹 포트 설정 누락으로 외부 접근 불가 → 인바운드 규칙 수정으로 해결
 - Tomcat 실행 포트(8081) 확인 및 방화벽 설정으로 서비스 운영
 - nohup.out, app.log 분석을 통한 서버 상태 진단
-
-#### 🚀 v3 재배포 계획 (예정)
-- Docker 컨테이너화로 배포 자동화 및 비용 효율화
-- GitHub Actions CI/CD 자동 배포 파이프라인 구축
-- Railway/Render 등 대체 플랫폼 검토
-- HTTPS 적용 (Let's Encrypt)
-- Nginx 리버스 프록시 설정
 
 ### 🚀 성능 최적화 (v3)
 - Redis 캐싱 도입 (인기 상품 조회)
